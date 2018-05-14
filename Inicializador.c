@@ -4,9 +4,12 @@
 #include <string.h>
 #include <stdlib.h>
 
-void Create_Memory(char * memory_name, int memory_key, int memory_size){
+void Create_Memory(char * memory_name, int memory_key, int lines_memory){
 	//Crea la llave unica
+	// buffer[lines_memory][5];
+
 	int key = ftok(memory_name, memory_key);
+	printf("La llave de la memoria es %d\n",key );
 	if(key == -1){
 		printf("Error!!!  con la llave\n");
 		exit(1);
@@ -14,7 +17,7 @@ void Create_Memory(char * memory_name, int memory_key, int memory_size){
 
 	printf("Creando la memoria compartida\n");
 	// Crea la memoria compartida
-	int shmid  = shmget (key, sizeof(int)*memory_size, 0777 | IPC_CREAT);
+	int shmid  = shmget (key,lines_memory, 0777 | IPC_CREAT);
 	if (shmid  == -1) {
 		printf("Error!!!  creando la memoria compartida \n");
 		exit(1);
@@ -22,19 +25,23 @@ void Create_Memory(char * memory_name, int memory_key, int memory_size){
 
 	printf("Memoria creada con el id:  %d\n", shmid );
 
-	int *buffer;
 
 	// Para usar la memoria hay que hacerle attached
-	buffer = shmat (shmid , (char *)0, 0);
+	char *buffer; /* shared buffer */
+	buffer = shmat (shmid , (char *)0 , 0);
 	if (buffer == NULL) {
 		printf("Error!!!  reservando la memoria compartida\n");
 		exit(1);
 	}
 
+
 	//Limpio el buffer de la memoria
 	int i;
-	for (i = 0; i < memory_size; i++){
-		buffer[i] = -1;
+	for (i = 0; i < lines_memory; i++){
+		buffer[i] = 'X';
+	};
+	for (i = 0; i < lines_memory; i++){
+		printf("segment contains: \"%c\"\n", buffer[i]);
 	};	
 }
 
@@ -44,10 +51,11 @@ int main(int argc, char const *argv[])
 	//Deben crearce los semaforos antes de todo
 
 	//solicita la memoria o lineasrequerida 
-	int size_memory;
-	printf("Ingrese la cantidad de memoria que desea reservar \n");
-	scanf("%d",&size_memory);
+	int lines_memory;
+	int largo_mensaje = 10;
+	printf("Ingrese la cantidad de lineas que desea reservar\n");
+	scanf("%d",&lines_memory);
 
-	Create_Memory("/bin/cat", 65, size_memory);
+	Create_Memory("/bin/cat", 65, lines_memory * largo_mensaje);
 	return 0;
 }
