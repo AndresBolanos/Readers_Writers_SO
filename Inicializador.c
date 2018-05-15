@@ -9,6 +9,7 @@ void Create_Memory(char * memory_name, int memory_key, int lines_memory){
 	// buffer[lines_memory][5];
 
 	int key = ftok(memory_name, memory_key);
+	printf("La llave de la memoria es %d\n",key );
 	if(key == -1){
 		printf("Error!!!  con la llave\n");
 		exit(1);
@@ -36,9 +37,19 @@ void Create_Memory(char * memory_name, int memory_key, int lines_memory){
 
 	//Limpio el buffer de la memoria
 	int i;
+	int cont = 0;
 	for (i = 0; i < lines_memory; i++){
-		buffer[i] = 'X';
-	};
+		if (cont == 34){
+			buffer[i] = ',';
+			cont = 0;
+		}
+		else{
+			buffer[i] = 'X';
+			cont++;
+		}
+	}
+		
+
 	for (i = 0; i < lines_memory; i++){
 		printf("segment contains: \"%c\"\n", buffer[i]);
 	};	
@@ -51,7 +62,7 @@ int main(int argc, char const *argv[])
 
 	//solicita la memoria o lineasrequerida 
 	int lines_memory;
-	int largo_mensaje = 10;
+	int largo_mensaje =34;
 	printf("Ingrese la cantidad de lineas que desea reservar\n");
 	scanf("%d",&lines_memory);
 
