@@ -1,3 +1,4 @@
+#include "Headers/Inicializador.h"
 #include <stdio.h>
 #include <sys/ipc.h>
 #include  <sys/shm.h>
@@ -7,6 +8,7 @@
 void Create_Memory(char * memory_name, int memory_key, int lines_memory){
 	//Crea la llave unica
 	// buffer[lines_memory][5];
+	sem_t * sem = NULL;
 
 	int key = ftok(memory_name, memory_key);
 	printf("La llave de la memoria es %d\n",key );
@@ -14,6 +16,9 @@ void Create_Memory(char * memory_name, int memory_key, int lines_memory){
 		printf("Error!!!  con la llave\n");
 		exit(1);
 	}
+
+	//Se crea el semaforo
+	sem = (sem_t *) solicitar_sem("Marianita");
 
 	printf("Creando la memoria compartida\n");
 	// Crea la memoria compartida
