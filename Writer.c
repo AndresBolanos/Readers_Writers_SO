@@ -1,3 +1,4 @@
+#include "Headers/Writer.h"
 #include <stdio.h>
 #include <sys/ipc.h>
 #include  <sys/shm.h>
@@ -10,6 +11,11 @@
 
 #define KEY 1090584602
 #define MENSAJE 34
+
+
+//Compile project
+//gcc -w Writer.c -o Writer -pthread
+//./Writer
 
 struct Writer
 {
@@ -33,7 +39,12 @@ char *Create_Buffer(struct Writer *writer, int linea, char *buffer){
 
 void Write_line(struct Writer *writer){
 	char *shm, *s;
+	sem_t * sem = NULL; 	//Definimos el semaforo
 
+	//Se crea el semaforo
+	sem = (sem_t *) solicitar_sem(SEM_NAME);
+
+	//Se pide la memoria
 	int shmid  = shmget (KEY,MENSAJE, 0777);
 	if (shmid  == -1) {
 		printf("Error!!!  creando la memoria compartida \n");
@@ -41,6 +52,9 @@ void Write_line(struct Writer *writer){
 	}
 
     printf("Memoria accesada\n");
+
+    //Bloqueo la memoria
+	bloquear_sem(sem);
 
     // Para usar la memoria hay que hacerle attached
 	char *buffer; /* shared buffer */
@@ -53,7 +67,8 @@ void Write_line(struct Writer *writer){
 	char linea[34];
 	Create_Buffer(writer, 10, linea);
 	printf("Memoria lista para escribir\n");
-	//Limpio el buffer de la memoria
+	
+	//Se escribe en memoria
 	int i;
 	int cont = 0;
 	bool flag = true;
@@ -69,18 +84,24 @@ void Write_line(struct Writer *writer){
 		}
 		else if (cont > 0){
 			if (buffer[i]==','){
+				printf("Escribe -> %s\n", linea);
+				sleep(writer->escribe);
 				break;
 			}
 			buffer[i]='*';
 			cont++;
 		}
 		else if (buffer[i] == ','){
+			printf("Escribe -> %s\n", linea);
+			sleep(writer->escribe);
 			num_linea++;
 		}
 	}
 	for (i = 0; i < strlen (buffer); i++){
-		printf("segment contains: \"%c\"\n", buffer[i]);
+		printf("El segmento contiene: \"%c\"\n", buffer[i]);
 	};
+	//Se desbloquea la memoria
+	desbloquear_sem(sem);
 }
 
 void Creador_Writers(int cantidad, int escritura, int dormido){

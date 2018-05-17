@@ -13,6 +13,7 @@
 // Otros headers
 #include "Funciones.h"
 #include "Inicializador.h"
+#include "Writer.h"
 #include <pthread.h>
 #include <stdbool.h>
 #include <unistd.h>
@@ -28,9 +29,8 @@
 #include <sys/sem.h>
 #include <fcntl.h>
 
-
-// Variables globales
+//Variables globales
 #define SEM_NAME        "/Shared_memory"
 
 
-#endif //SHAREDMEMORY_BIBLIOTECAS_H
+#endif

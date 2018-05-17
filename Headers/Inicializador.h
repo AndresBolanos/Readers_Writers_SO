@@ -6,4 +6,4 @@
 
 void Create_Memory(char * memory_name, int memory_key, int lines_memory);
 
-#endif //SHAREDMEMORY_INICIALIZADOR_H
+#endif 

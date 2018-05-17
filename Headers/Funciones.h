@@ -10,4 +10,4 @@ void desbloquear_sem(void * sem_ref);
 void cerrar_sem(void * sem_ref);
 
 
-#endif //SHAREDMEMORY_HERRAMIENTAS_H
+#endif 

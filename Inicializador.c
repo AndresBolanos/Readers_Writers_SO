@@ -5,6 +5,14 @@
 #include <string.h>
 #include <stdlib.h>
 
+//Compile project
+//gcc -w Inicializador.c Funciones.c  -o Inicializador -pthread
+//./Inicializador
+//Clean Memory
+//ipcrm -M 0x4101001a
+//See memory keys
+//ipcs
+
 void Create_Memory(char * memory_name, int memory_key, int lines_memory){
 	//Crea la llave unica
 	// buffer[lines_memory][5];
@@ -18,7 +26,7 @@ void Create_Memory(char * memory_name, int memory_key, int lines_memory){
 	}
 
 	//Se crea el semaforo
-	sem = (sem_t *) solicitar_sem("Marianita");
+	sem = (sem_t *) solicitar_sem(SEM_NAME);
 
 	printf("Creando la memoria compartida\n");
 	// Crea la memoria compartida
@@ -30,6 +38,8 @@ void Create_Memory(char * memory_name, int memory_key, int lines_memory){
 
 	printf("Memoria creada con el id:  %d\n", shmid );
 
+	//Bloqueo la memoria
+	bloquear_sem(sem);
 
 	// Para usar la memoria hay que hacerle attached
 	char *buffer; /* shared buffer */
@@ -38,7 +48,6 @@ void Create_Memory(char * memory_name, int memory_key, int lines_memory){
 		printf("Error!!!  reservando la memoria compartida\n");
 		exit(1);
 	}
-
 
 	//Limpio el buffer de la memoria
 	int i;
@@ -52,18 +61,18 @@ void Create_Memory(char * memory_name, int memory_key, int lines_memory){
 			buffer[i] = 'X';
 			cont++;
 		}
-	}
-		
-
+	}	
+	
 	for (i = 0; i < lines_memory; i++){
 		printf("segment contains: \"%c\"\n", buffer[i]);
-	};	
+	};
+	//Se desbloquea la memoria
+	desbloquear_sem(sem);	
 }
 
 int main(int argc, char const *argv[])
 {
 	//Deben limpiarce los archivos antes de todo
-	//Deben crearce los semaforos antes de todo
 
 	//solicita la memoria o lineasrequerida 
 	int lines_memory;
