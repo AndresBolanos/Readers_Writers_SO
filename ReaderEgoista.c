@@ -1,4 +1,3 @@
-#include "Headers/Reader.h"
 #include <stdio.h>
 #include <sys/ipc.h>
 #include  <sys/shm.h>
@@ -10,10 +9,6 @@
 
 #define KEY 1090584602
 #define MENSAJE 34
-
-//Compile the code
-//gcc -w Reader.c Funciones.c  -o Reader -pthread
-//
 
 struct Reader
 {
@@ -31,9 +26,6 @@ char* timestamp(){
 
 void ReadMemory(int memory_key, int lines_memory){
 	char *shm, *s;
-	sem_t * sem = NULL; 	//Definimos el semaforo
-	//Se crea el semaforo
-	sem = (sem_t *) solicitar_sem(SEM_NAME);
 
 	int shmid  = shmget (KEY,MENSAJE, 0777);
 
@@ -44,10 +36,6 @@ void ReadMemory(int memory_key, int lines_memory){
 
     printf("Memoria accesada\n");
 
-	//Bloqueo la memoria
-	save_state('R', "estado.txt"); //Se guarda en un archivo que un semaforo esta en memoria
-	bloquear_sem(sem);
-
     // Para usar la memoria hay que hacerle attached
 	char *buffer; /* shared buffer */
 	buffer = shmat (shmid , (char *)0 , 0);
@@ -57,26 +45,22 @@ void ReadMemory(int memory_key, int lines_memory){
 	}
 
 	printf("Memoria lista para leer\n");
+	int lineas = strlen(buffer) / MENSAJE;
+	int posicion = (rand() % lineas);
+	printf("%d\n", posicion);
 	int i;
 	int linea = 0;
 	for (i = 0; i < strlen(buffer); i++){
 		if (buffer[i] == ','){
-			if (buffer[i-1] != 'X'){
-				printf("\n");
-			}
 			linea++;
 		}
-		else{
-			if (buffer[i] != 'X'){
-				printf("%c", buffer[i]);
-			}
+		else if (linea == posicion){
+			buffer[i] = 'X';
 		}
 	}
-	//Se desbloquea la memoria
-	desbloquear_sem(sem);
 }
 
-void Creador_Readers(int cantidad, int lectura, int dormido){ 
+void Creador_Readers_Egoistas(int cantidad, int lectura, int dormido){ 
 	for (int i = 0; i < cantidad; i++){
 		pthread_t thread1;
 		struct Reader reader1; // = {i,0, timestamp(), escritura, dormido};
@@ -95,12 +79,12 @@ int main(int argc, char const *argv[])
 	int cantidad;
 	int lectura;
 	int dormido;
-	printf("Ingrese la cantidad de readers que desea: ");
+	printf("Ingrese la cantidad de readers egoistas que desea: ");
 	scanf("%d",&cantidad);
 	printf("Ingrese la cantidad de tiempo que tarda leyendo: ");
 	scanf("%d",&lectura);
 	printf("Ingrese la cantidad de tiempo que tarda durmiendo: ");
 	scanf("%d",&dormido);
-	Creador_Readers(cantidad, lectura, dormido);
+	Creador_Readers_Egoistas(cantidad, lectura, dormido);
 	return 0;
 }
