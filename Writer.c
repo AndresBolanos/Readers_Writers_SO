@@ -54,54 +54,58 @@ void Write_line(struct Writer *writer){
     printf("Memoria accesada\n");
 
     //Bloqueo la memoria
-	bloquear_sem(sem);
+	bool permiso = bloquear_sem(sem);
+	if (permiso){
+		// Para usar la memoria hay que hacerle attached
+		char *buffer; /* shared buffer */
+		buffer = shmat (shmid , (char *)0 , 0);
 
-    // Para usar la memoria hay que hacerle attached
-	char *buffer; /* shared buffer */
-	buffer = shmat (shmid , (char *)0 , 0);
-
-	if (buffer == NULL) {
-		printf("Error!!!  No se puede hacer attached\n");
-		exit(1);
-	}
-	char linea[34];
-	Create_Buffer(writer, 10, linea);
-	printf("Memoria lista para escribir\n");
-	
-	//Se escribe en memoria
-	int i;
-	int cont = 0;
-	bool flag = true;
-	int num_linea = 0;
-	for (i = 0; i < strlen (buffer); i++){
-		if (buffer[i] == 'X' && cont < strlen(linea)){
-			if (flag){
-				flag = false;
-				Create_Buffer(writer, num_linea, linea);
-			}
-			buffer[i] = linea[cont];
-			cont++;
+		if (buffer == NULL) {
+			printf("Error!!!  No se puede hacer attached\n");
+			exit(1);
 		}
-		else if (cont > 0){
-			if (buffer[i]==','){
+		char linea[34];
+		Create_Buffer(writer, 10, linea);
+		printf("Memoria lista para escribir\n");
+		
+		//Se escribe en memoria
+		int i;
+		int cont = 0;
+		bool flag = true;
+		int num_linea = 0;
+		for (i = 0; i < strlen (buffer); i++){
+			if (buffer[i] == 'X' && cont < strlen(linea)){
+				if (flag){
+					flag = false;
+					Create_Buffer(writer, num_linea, linea);
+				}
+				buffer[i] = linea[cont];
+				cont++;
+			}
+			else if (cont > 0){
+				if (buffer[i]==','){
+					printf("Escribe -> %s\n", linea);
+					sleep(writer->escribe);
+					break;
+				}
+				buffer[i]='*';
+				cont++;
+			}
+			else if (buffer[i] == ','){
 				printf("Escribe -> %s\n", linea);
 				sleep(writer->escribe);
-				break;
+				num_linea++;
 			}
-			buffer[i]='*';
-			cont++;
 		}
-		else if (buffer[i] == ','){
-			printf("Escribe -> %s\n", linea);
-			sleep(writer->escribe);
-			num_linea++;
-		}
+		for (i = 0; i < strlen (buffer); i++){
+			printf("El segmento contiene: \"%c\"\n", buffer[i]);
+		};
+		//Se desbloquea la memoria
+		desbloquear_sem(sem);
 	}
-	for (i = 0; i < strlen (buffer); i++){
-		printf("El segmento contiene: \"%c\"\n", buffer[i]);
-	};
-	//Se desbloquea la memoria
-	desbloquear_sem(sem);
+	else{
+		printf("No se puede accesar");
+	}
 }
 
 void Creador_Writers(int cantidad, int escritura, int dormido){

@@ -27,20 +27,27 @@ void * solicitar_sem(char * nombre_sem)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void bloquear_sem(void * sem_ref)
+bool bloquear_sem(void * sem_ref)
 {
     sem_t * sem = (sem_t *) sem_ref;
     int result = 0;
 
     printf("Bloqueando semaforo...");
 
-    result = sem_wait(sem);
-    if (result == -1)
-    {
-        printf("ERROR\n");
-        exit(2);
+    if (read_state("estado.txt") != 'R'){
+        result = sem_wait(sem);
+        if (result == -1)
+        {
+            printf("ERROR\n");
+            exit(2);
+        }
+        printf("OK\n");
+        return true;
     }
-    printf("OK\n");
+    else{
+        printf("Hay un reader en memoria\n");
+        return false;
+    }
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -100,4 +107,23 @@ void save_state(char sem, char * file_name)
     }
     fprintf(file, "%c", sem);
     fclose(file);
+}
+
+
+
+char read_state(char * file_name)
+{
+    FILE *file;
+    char buff;
+
+    file = fopen(file_name, "r");
+    if (file){
+        buff = (char)fgetc(file);
+        fclose(file);
+        printf("Bffer%c\n",buff );
+        return buff;
+    }else{
+       return 'N';
+    }
+    
 }
