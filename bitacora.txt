@@ -1,0 +1,4 @@
+Writer PID: 0, escribió: 0-Fri May 18 21:47:07 201-0
+Writer PID: 0, escribió: 0-Fri May 18 21:47:09 201-1
+Writer PID: 0, escribió: 0-Fri May 18 21:47:11 201-2
+Writer PID: 0, escribió: 0-Fri May 18 21:47:13 201-3
