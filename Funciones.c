@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <pthread.h>
 
+//Tipos de semaforos E=Egoista, R = Reader, W = Writer y I = Inicializador
 
 void * solicitar_sem(char * nombre_sem)
 {
@@ -27,26 +28,41 @@ void * solicitar_sem(char * nombre_sem)
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-void bloquear_sem(void * sem_ref)
+bool bloquear_sem(void * sem_ref, char tipo)
 {
     sem_t * sem = (sem_t *) sem_ref;
     int result = 0;
 
     printf("Bloqueando semaforo...");
 
-    //if (read_state("estado.txt") != 'R'){
-    result = sem_wait(sem);
-    if (result == -1)
-    {
-        printf("ERROR\n");
-        exit(2);
+    int egoistas = read_int(EGOISTAS);
+    if (tipo == 'E'){
+        
+        egoistas += 1;
+        //Se guarda en el archivo el id de la memoria
+        save_int(egoistas,EGOISTAS);
     }
-    printf("OK\n");
-    /*}
     else{
-        printf("Hay un reader en memoria\n");
-        return false;
-    }*/
+        save_int(0,EGOISTAS);
+    }
+    if (egoistas <= 2){
+        //if (read_state("estado.txt") != 'R'){
+        result = sem_wait(sem);
+        if (result == -1)
+        {
+            printf("ERROR\n");
+            exit(2);
+            return false;
+        }
+        printf("Semaforo tipo %c\n", tipo);
+        printf("OK\n");
+        return true;
+    }
+    else{
+         printf("Hay mas de dos readers egoistas seguidos\n");  
+         return false; 
+    }
+    
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/

@@ -24,3 +24,46 @@ Reader PID: 1 en la línea 0, leyó y borró: 0-Sat May 19 23:31:10 201-0*******
 Writer PID: 0, escribió: 0-Sun May 20 08:21:41 201-0
 Writer PID: 0, escribió: 0-Sun May 20 08:21:43 201-1
 Writer PID: 0, escribió: 0-Sun May 20 08:21:45 201-2
+Egoista PID: 1 en la línea 13, leyó y borró: 
+Egoista PID: 0 en la línea 1, leyó y borró: 
+Egoista PID: 1 en la línea 12, leyó y borró: 
+Egoista PID: 0 en la línea 10, leyó y borró: 
+Egoista PID: 1 en la línea 8, leyó y borró: 
+Egoista PID: 0 en la línea 10, leyó y borró: 
+Egoista PID: 1 en la línea 1, leyó y borró: 
+Egoista PID: 0 en la línea 13, leyó y borró: 
+Egoista PID: 0 en la línea 1, leyó y borró: 
+Egoista PID: 0 en la línea 12, leyó y borró: 
+Egoista PID: 0 en la línea 10, leyó y borró: 
+Egoista PID: 0 en la línea 8, leyó y borró: 
+Egoista PID: 0 en la línea 10, leyó y borró: 
+Egoista PID: 0 en la línea 13, leyó y borró: 
+Egoista PID: 0 en la línea 1, leyó y borró: 
+Egoista PID: 0 en la línea 13, leyó y borró: 
+Egoista PID: 0 en la línea 1, leyó y borró: 
+Egoista PID: 0 en la línea 12, leyó y borró: 
+Egoista PID: 0 en la línea 10, leyó y borró: 
+Egoista PID: 0 en la línea 8, leyó y borró: 
+Egoista PID: 0 en la línea 10, leyó y borró: 
+Egoista PID: 0 en la línea 1, leyó y borró: 
+Egoista PID: 0 en la línea 12, leyó y borró: 
+Egoista PID: 0 en la línea 13, leyó y borró: 
+Egoista PID: 0 en la línea 1, leyó y borró: 
+Egoista PID: 0 en la línea 13, leyó y borró: 
+Egoista PID: 0 en la línea 1, leyó y borró: 
+Egoista PID: 1 en la línea 13, leyó y borró: 
+Egoista PID: 0 en la línea 1, leyó y borró: 
+Writer PID: 0, escribió: 0-Sun May 20 09:29:17 201-0
+Writer PID: 0, escribió: 0-Sun May 20 09:29:21 201-1
+Writer PID: 0, escribió: 0-Sun May 20 09:29:25 201-2
+Writer PID: 0, escribió: 0-Sun May 20 09:29:29 201-3
+Egoista PID: 2 en la línea 13, leyó y borró: 
+Egoista PID: 1 en la línea 1, leyó y borró: 0-Sun May 20 09:29:21 201-1*******
+Egoista PID: 0 en la línea 12, leyó y borró: 
+Writer PID: 0, escribió: 0-Sun May 20 09:29:35 201-1
+Egoista PID: 2 en la línea 10, leyó y borró: 
+Egoista PID: 1 en la línea 8, leyó y borró: 
+Egoista PID: 0 en la línea 10, leyó y borró: 
+Writer PID: 0, escribió: 0-Sun May 20 09:29:41 201-4
+Egoista PID: 2 en la línea 1, leyó y borró: 0-Sun May 20 09:29:35 201-1*******
+Egoista PID: 1 en la línea 12, leyó y borró: 

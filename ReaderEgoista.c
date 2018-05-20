@@ -9,7 +9,6 @@
 #include <time.h>
 #include <stdbool.h>
 
-#define KEY 1091108217
 #define MENSAJE 34
 
 sem_t * sem = NULL; 	//Definimos el semaforo
@@ -30,7 +29,11 @@ char* timestamp(){
 
 void ReadMemory(void * reader2){
 	struct Reader * reader1 = (struct Reader*) reader2;
-	int shmid  = shmget (KEY,MENSAJE, 0777);
+
+	//Se lee la memoria del archivo de texto
+	int key = read_int("id_memory.txt");
+
+	int shmid  = shmget (key,MENSAJE, 0777);
 	if (shmid  == -1) {
 		printf("Error!!!  creando la memoria compartida \n");
 		exit(1);
@@ -39,22 +42,30 @@ void ReadMemory(void * reader2){
 
     while(true){
     	//Bloqueo la memoria
-		bloquear_sem(sem);
-		// Para usar la memoria hay que hacerle attached
-		char *buffer; /* shared buffer */
-		buffer = shmat (shmid , (char *)0 , 0);
+		bool resp = bloquear_sem(sem, 'E');
+		if (resp){
+			// Para usar la memoria hay que hacerle attached
+			char *buffer; /* shared buffer */
+			buffer = shmat (shmid , (char *)0 , 0);
 
-		reader1->tiempo = timestamp();
-		ReadMemory_aux(reader1, buffer);
+			reader1->tiempo = timestamp();
+			ReadMemory_aux(reader1, buffer);
+			
+			printf("%s%d\n", "LEYENDO ",reader1->id);
+			sleep(reader1->lectura);
+			
+			//Se desbloquea la memoria
+			desbloquear_sem(sem);
 		
-		printf("%s%d\n", "LEYENDO ",reader1->id);
-		sleep(reader1->lectura);
+			printf("%s%d\n", "DURMIENDO ",reader1->id);
+			sleep(reader1->dormido);
+		}
+		else{
+			printf("No se puede entrar\n");
+			printf("%s%d\n", "DURMIENDO ",reader1->id);
+			sleep(reader1->dormido);
+		}
 		
-		//Se desbloquea la memoria
-		desbloquear_sem(sem);
-	
-		printf("%s%d\n", "DURMIENDO ",reader1->id);
-		sleep(reader1->dormido);
     }
 }
 

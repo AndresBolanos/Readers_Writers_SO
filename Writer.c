@@ -54,21 +54,29 @@ void Write_line(void * writer2){
 
 	while(true){
 	    //Bloqueo la memoria
-		bloquear_sem(sem);
-		// Para usar la memoria hay que hacerle attached
-		char *buffer; /* shared buffer */
-		buffer = shmat (shmid , (char *)0 , 0);
+		bool resp = bloquear_sem(sem, 'W');
+		if (resp){
+			// Para usar la memoria hay que hacerle attached
+			char *buffer; /* shared buffer */
+			buffer = shmat (shmid , (char *)0 , 0);
 
-		writer1->tiempo = timestamp();
-		Write_line_aux(writer1, buffer);
-		printf("%s%d\n", "ESCRIBIENDO ",writer1->id);
-		sleep(writer1->escribe);
+			writer1->tiempo = timestamp();
+			Write_line_aux(writer1, buffer);
+			printf("%s%d\n", "ESCRIBIENDO ",writer1->id);
+			sleep(writer1->escribe);
+			
+			//Se desbloquea la memoria
+			desbloquear_sem(sem);
 		
-		//Se desbloquea la memoria
-		desbloquear_sem(sem);
-	
-		printf("%s%d\n", "DURMIENDO ",writer1->id);
-		sleep(writer1->dormido);
+			printf("%s%d\n", "DURMIENDO ",writer1->id);
+			sleep(writer1->dormido);
+		}
+		else{
+			printf("No se puede entrar\n");
+			printf("%s%d\n", "DURMIENDO ",writer1->id);
+			sleep(writer1->dormido);
+		}
+		
 	
 	}
 

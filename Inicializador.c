@@ -31,6 +31,8 @@ void Create_Memory(char * memory_name, int memory_key, int lines_memory){
 
 	//Se crea el semaforo
 	sem = (sem_t *) solicitar_sem(SEM_NAME);
+	//Se guarda que hay cero egoistas en memoria
+	save_int(0,EGOISTAS);
 
 	printf("Creando la memoria compartida\n");
 	// Crea la memoria compartida
@@ -43,31 +45,37 @@ void Create_Memory(char * memory_name, int memory_key, int lines_memory){
 	printf("Memoria creada con el id:  %d\n", shmid );
 
 	//Bloqueo la memoria
-	bloquear_sem(sem);
+	bool resp = bloquear_sem(sem, 'I');
 
-	// Para usar la memoria hay que hacerle attached
-	char *buffer; /* shared buffer */
-	buffer = shmat (shmid , (char *)0 , 0);
-	if (buffer == NULL) {
-		printf("Error!!!  reservando la memoria compartida\n");
-		exit(1);
+	if (resp){
+		// Para usar la memoria hay que hacerle attached
+		char *buffer; /* shared buffer */
+		buffer = shmat (shmid , (char *)0 , 0);
+		if (buffer == NULL) {
+			printf("Error!!!  reservando la memoria compartida\n");
+			exit(1);
+		}
+
+		//Limpio el buffer de la memoria
+		int i;
+		int cont = 0;
+		for (i = 0; i < lines_memory; i++){
+			if (cont == 34){
+				buffer[i] = ',';
+				cont = 0;
+			}
+			else{
+				buffer[i] = 'X';
+				cont++;
+			}
+		}	
+		//Se desbloquea la memoria
+		desbloquear_sem(sem);	
 	}
-
-	//Limpio el buffer de la memoria
-	int i;
-	int cont = 0;
-	for (i = 0; i < lines_memory; i++){
-		if (cont == 34){
-			buffer[i] = ',';
-			cont = 0;
-		}
-		else{
-			buffer[i] = 'X';
-			cont++;
-		}
-	}	
-	//Se desbloquea la memoria
-	desbloquear_sem(sem);	
+	else{
+		printf("Error!! No se puede escribir la memoria\n");
+	}
+	
 }
 
 int main(int argc, char const *argv[])

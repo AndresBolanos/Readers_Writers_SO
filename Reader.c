@@ -54,8 +54,9 @@ void ReadMemory(void * reader2){
     	 
 
     	//Bloqueo la memoria
+    	bool resp = false;
     	if (cantidadReaders ==0){
-    		bloquear_sem(sem);
+    		resp = bloquear_sem(sem,'R');
     		buffer = shmat (shmid , (char *)0 , 0);
     	}
 
@@ -63,20 +64,28 @@ void ReadMemory(void * reader2){
 
     	}
 
-    	cantidadReaders= cantidadReaders+1;
+    	if (resp){
+    		cantidadReaders= cantidadReaders+1;
 
-		reader1->tiempo = timestamp();
-		ReadMemory_Aux(reader1, buffer);
-		printf("%s%d\n", "LEYENDO ",reader1->id);
-		sleep(reader1->lectura);
-		
-		if(cantidadReaders ==1){
-			//Se desbloquea la memoria
-			desbloquear_sem(sem);
-		}
-		cantidadReaders = cantidadReaders-1;
-		printf("%s%d\n", "DURMIENDO ",reader1->id);
-		sleep(reader1->dormido);
+			reader1->tiempo = timestamp();
+			ReadMemory_Aux(reader1, buffer);
+			printf("%s%d\n", "LEYENDO ",reader1->id);
+			sleep(reader1->lectura);
+			
+			if(cantidadReaders ==1){
+				//Se desbloquea la memoria
+				desbloquear_sem(sem);
+			}
+			cantidadReaders = cantidadReaders-1;
+			printf("%s%d\n", "DURMIENDO ",reader1->id);
+			sleep(reader1->dormido);
+    	}
+    	else{
+    		printf("No se puede entrar\n");
+			printf("%s%d\n", "DURMIENDO ",reader1->id);
+			sleep(reader1->dormido);
+    	}
+    	
     }
 	//save_state('R', "estado.txt"); //Se guarda en un archivo que un semaforo esta en memori
 
