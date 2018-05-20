@@ -15,6 +15,7 @@ void * solicitar_sem(char * nombre_sem)
 
     if (!sem == SEM_FAILED)
         printf("creado...");
+
     else if (errno == EEXIST)
     {
         sem = sem_open (nombre_sem, 0);
@@ -33,6 +34,7 @@ void bloquear_sem(void * sem_ref)
 
     printf("Bloqueando semaforo...");
 
+    //if (read_state("estado.txt") != 'R'){
     result = sem_wait(sem);
     if (result == -1)
     {
@@ -40,6 +42,11 @@ void bloquear_sem(void * sem_ref)
         exit(2);
     }
     printf("OK\n");
+    /*}
+    else{
+        printf("Hay un reader en memoria\n");
+        return false;
+    }*/
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -85,4 +92,39 @@ void cerrar_sem(void * sem_ref)
         exit(2);
     }
     printf("OK\n");
+}
+
+
+//Estas dos funciones las tengo ahi para manejar masomenos lo de sincronizar
+//Guardar el estado de cual nodo esta ocupando la memoria
+//Temporal para prueba
+void save_state(char sem, char * file_name)
+{
+    FILE *file = fopen(file_name, "w");
+    if (file == NULL)
+    {
+        printf("Error opening file!\n");
+        exit(1);
+    }
+    fprintf(file, "%c", sem);
+    fclose(file);
+}
+
+
+
+char read_state(char * file_name)
+{
+    FILE *file;
+    char buff;
+
+    file = fopen(file_name, "r");
+    if (file){
+        buff = (char)fgetc(file);
+        fclose(file);
+        printf("Bffer%c\n",buff );
+        return buff;
+    }else{
+       return 'N';
+    }
+    
 }

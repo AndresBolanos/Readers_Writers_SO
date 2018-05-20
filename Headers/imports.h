@@ -9,11 +9,13 @@
 #include <string.h>
 #include <errno.h>
 #include <signal.h>
+#include <stdbool.h>
 
 // Otros headers
 #include "Funciones.h"
 #include "Inicializador.h"
 #include "Writer.h"
+
 #include <pthread.h>
 #include <stdbool.h>
 #include <unistd.h>
@@ -30,7 +32,7 @@
 #include <fcntl.h>
 
 //Variables globales
-#define SEM_NAME        "/Shared_memory"
+#define SEM_NAME        "/Shared_memori"
 
 
 #endif

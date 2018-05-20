@@ -62,10 +62,6 @@ void Create_Memory(char * memory_name, int memory_key, int lines_memory){
 			cont++;
 		}
 	}	
-	
-	for (i = 0; i < lines_memory; i++){
-		printf("segment contains: \"%c\"\n", buffer[i]);
-	};
 	//Se desbloquea la memoria
 	desbloquear_sem(sem);	
 }
