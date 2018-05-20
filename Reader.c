@@ -8,7 +8,7 @@
 #include <semaphore.h>
 #include <time.h>
 
-#define KEY 1090584602
+#define KEY 1091108217
 #define MENSAJE 34
 
 sem_t * sem = NULL; 	//Definimos el semaforo
@@ -23,6 +23,7 @@ struct Reader
   char *tiempo;
   int dormido; 
   int lectura;
+  int linea;
 } Reader;
 
 char* timestamp(){
@@ -76,20 +77,71 @@ void ReadMemory_Aux(struct Reader *reader, char *buffer){
 	printf("Memoria lista para leer\n");
 	int i;
 	int linea = 0;
-
+	int primerChar =0;
+	int lineas = strlen(buffer) / MENSAJE;
 	for (i = 0; i < strlen(buffer); i++){
 		if (buffer[i] == ','){
-			if (buffer[i-1] != 'X'){
+			if (buffer[i-1] != 'X' && primerChar != 0){
 				printf("\n");
+				registrar_accion("bitacora.txt", reader->id, buffer[i], 2, linea);
+				primerChar =0;
+				reader->linea = linea+1;
+				if(reader->linea == lineas){
+					reader->linea=0;
+				}
+				break;
 			}
 			linea++;
 		}
 		else{
-			if (buffer[i] != 'X'){
-				printf("%c", buffer[i]);
+			if (reader->linea == linea){
+				if (buffer[i] != 'X'){
+					if (i+1 == strlen(buffer)){
+						printf("%s\n", "YES");
+						registrar_accion("bitacora.txt", reader->id, buffer[i], 1, linea);
+						registrar_accion("bitacora.txt", reader->id, buffer[i], 2, linea);
+						reader->linea=0;
+						break;
+					}
+					if (primerChar == 0){
+						primerChar = 1;
+						registrar_accion("bitacora.txt", reader->id, "",0, linea);
+					}
+					registrar_accion("bitacora.txt", reader->id, buffer[i], 1, linea);
+					printf("%c", buffer[i]);
+				}
+				else{
+					reader->linea = linea+1;
+					if(reader->linea == lineas){
+					reader->linea=0;
+				}
+				}
 			}
 		}
 	}
+}
+
+void registrar_accion(char * file_name, int id, char * registro, int cont, int linea){
+    FILE *fptr;
+
+    //Se abre con "a" para realizar un append en el archivo
+    fptr = fopen(file_name, "a");
+    if(fptr == NULL)
+    {
+        printf("Error opening file!");
+        exit(1);
+    }
+    if(cont ==0){
+    	fprintf(fptr,"%s%d%s%d%s", "Reader PID: ", id , " en la línea ", linea,", leyó: ");
+    }
+    else if (cont ==1){
+    	fprintf(fptr,"%c",registro);
+    }
+    else{
+    	fprintf(fptr,"\n");
+    }
+    
+    fclose(fptr);
 }
 
 void Creador_Readers(int cantidad, int lectura, int dormido){
@@ -98,7 +150,7 @@ void Creador_Readers(int cantidad, int lectura, int dormido){
 	sem = (sem_t *) solicitar_sem(SEM_NAME);
 	pthread_t thread1;
 	int i;
-	for (int i = 0; i < cantidad; i++){
+	for (i = 0; i < cantidad; i++){
 		
 		struct Reader *reader1; // = {i,0, timestamp(), escritura, dormido};
 		reader1 = malloc(sizeof(Reader));
@@ -107,6 +159,7 @@ void Creador_Readers(int cantidad, int lectura, int dormido){
 		reader1->tiempo = timestamp();
 		reader1->lectura = lectura;
 		reader1->dormido = dormido;
+		reader1->linea=0;
 		pthread_create (&thread1, NULL, ReadMemory, (void*)reader1);
 
 	}
