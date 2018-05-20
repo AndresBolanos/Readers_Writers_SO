@@ -20,6 +20,10 @@ void Create_Memory(char * memory_name, int memory_key, int lines_memory){
 
 	int key = ftok(memory_name, memory_key);
 	printf("La llave de la memoria es %d\n",key );
+
+	//Se guarda en el archivo el id de la memoria
+	save_int(key,ID_MEM_FILE);
+
 	if(key == -1){
 		printf("Error!!!  con la llave\n");
 		exit(1);

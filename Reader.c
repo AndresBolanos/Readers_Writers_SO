@@ -8,7 +8,6 @@
 #include <semaphore.h>
 #include <time.h>
 
-#define KEY 1091108217
 #define MENSAJE 34
 
 sem_t * sem = NULL; 	//Definimos el semaforo
@@ -38,7 +37,11 @@ void ReadMemory(void * reader2){
 
 	struct Reader * reader1 = (struct Reader*) reader2;
 	
-	int shmid  = shmget (KEY,MENSAJE, 0777);
+	//Se lee la memoria del archivo de texto
+	int key = read_int("id_memory.txt");
+
+	//Se pide la memoria
+	int shmid  = shmget (key,MENSAJE, 0777);
 
 	if (shmid  == -1) {
 		printf("Error!!!  creando la memoria compartida \n");

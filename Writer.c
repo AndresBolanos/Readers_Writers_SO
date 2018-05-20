@@ -9,7 +9,6 @@
 #include <time.h>
 #include <stdbool.h>
 
-#define KEY 1091108217
 #define MENSAJE 34
 
 sem_t * sem = NULL; 	//Definimos el semaforo
@@ -40,8 +39,12 @@ char *Create_Buffer(struct Writer *writer, int linea, char *buffer){
 
 void Write_line(void * writer2){
 	struct Writer * writer1 = (struct Writer*) writer2;
+	
+	//Se lee la memoria del archivo de texto
+	int key = read_int("id_memory.txt");
+
 	//Se pide la memoria
-	int shmid  = shmget (KEY,MENSAJE, 0777);
+	int shmid  = shmget (key,MENSAJE, 0777);
 	if (shmid  == -1) {
 		printf("Error!!!  creando la memoria compartida \n");
 		exit(1);

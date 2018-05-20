@@ -126,5 +126,36 @@ char read_state(char * file_name)
     }else{
        return 'N';
     }
+}
+
+//Guardar el id de la memoria
+void save_int(int num, char * file_name)
+{
+    FILE *file = fopen(file_name, "w");
+    if (file == NULL)
+    {
+        printf("Error opening file!\n");
+        exit(1);
+    }
+    fprintf(file, "%d", num);
+    fclose(file);
+}
+
+/*--------------------------------------------------------------------------------------------------------------------*/
+
+int read_int(char * file_name)
+{
+    FILE *file;
+    char buff[255];
+
+    file = fopen(file_name, "r");
+    if (file){
+        fscanf(file, "%s", buff);
+        fclose(file);
+
+        return atoi(buff);
+    }else{
+       return 0;
+    }
     
 }
