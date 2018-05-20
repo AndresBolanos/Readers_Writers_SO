@@ -1,7 +1,7 @@
 
 #include "Headers/imports.h"
 
-#define KEY 1090584602 //Deberia guardarse en un archivo
+#define KEY 1091108217 //Deberia guardarse en un archivo
 
 //Compile the program 
 //gcc -w Finalizador.c Funciones.c  -o Finalizador -pthread

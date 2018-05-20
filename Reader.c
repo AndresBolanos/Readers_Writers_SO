@@ -13,6 +13,8 @@
 
 sem_t * sem = NULL; 	//Definimos el semaforo
 
+cantidadReaders =0;
+char *buffer; // shared buffer
 //Compile the code
 //gcc -w Reader.c Funciones.c  -o Reader -pthread
 //./Reader
@@ -46,18 +48,30 @@ void ReadMemory(void * reader2){
     printf("Memoria accesada\n");
 
     while (true){
+    	 
+
     	//Bloqueo la memoria
-    	bloquear_sem(sem);
-    	char *buffer; // shared buffer 
-		buffer = shmat (shmid , (char *)0 , 0);
+    	if (cantidadReaders ==0){
+    		bloquear_sem(sem);
+    		buffer = shmat (shmid , (char *)0 , 0);
+    	}
+
+    	while(buffer == NULL){
+
+    	}
+
+    	cantidadReaders= cantidadReaders+1;
+
 		reader1->tiempo = timestamp();
 		ReadMemory_Aux(reader1, buffer);
 		printf("%s%d\n", "LEYENDO ",reader1->id);
 		sleep(reader1->lectura);
 		
-		//Se desbloquea la memoria
-		desbloquear_sem(sem);
-	
+		if(cantidadReaders ==1){
+			//Se desbloquea la memoria
+			desbloquear_sem(sem);
+		}
+		cantidadReaders = cantidadReaders-1;
 		printf("%s%d\n", "DURMIENDO ",reader1->id);
 		sleep(reader1->dormido);
     }
@@ -79,11 +93,13 @@ void ReadMemory_Aux(struct Reader *reader, char *buffer){
 	int linea = 0;
 	int primerChar =0;
 	int lineas = strlen(buffer) / MENSAJE;
+	char lineaMsj[34];
+	int contadorMsj =0;
 	for (i = 0; i < strlen(buffer); i++){
 		if (buffer[i] == ','){
 			if (buffer[i-1] != 'X' && primerChar != 0){
 				printf("\n");
-				registrar_accion("bitacora.txt", reader->id, buffer[i], 2, linea);
+				registrar_accion("bitacora.txt", reader->id, lineaMsj, linea);
 				primerChar =0;
 				reader->linea = linea+1;
 				if(reader->linea == lineas){
@@ -97,18 +113,19 @@ void ReadMemory_Aux(struct Reader *reader, char *buffer){
 			if (reader->linea == linea){
 				if (buffer[i] != 'X'){
 					if (i+1 == strlen(buffer)){
-						printf("%s\n", "YES");
-						registrar_accion("bitacora.txt", reader->id, buffer[i], 1, linea);
-						registrar_accion("bitacora.txt", reader->id, buffer[i], 2, linea);
+						registrar_accion("bitacora.txt", reader->id, lineaMsj, linea);
+						lineaMsj[contadorMsj] = buffer[i];
+						contadorMsj= contadorMsj +1;
+
 						reader->linea=0;
 						break;
 					}
 					if (primerChar == 0){
 						primerChar = 1;
-						registrar_accion("bitacora.txt", reader->id, "",0, linea);
 					}
-					registrar_accion("bitacora.txt", reader->id, buffer[i], 1, linea);
 					printf("%c", buffer[i]);
+					lineaMsj[contadorMsj] = buffer[i];
+					contadorMsj= contadorMsj +1;
 				}
 				else{
 					reader->linea = linea+1;
@@ -121,7 +138,7 @@ void ReadMemory_Aux(struct Reader *reader, char *buffer){
 	}
 }
 
-void registrar_accion(char * file_name, int id, char * registro, int cont, int linea){
+void registrar_accion(char * file_name, int id, char * registro, int linea){
     FILE *fptr;
 
     //Se abre con "a" para realizar un append en el archivo
@@ -131,16 +148,7 @@ void registrar_accion(char * file_name, int id, char * registro, int cont, int l
         printf("Error opening file!");
         exit(1);
     }
-    if(cont ==0){
-    	fprintf(fptr,"%s%d%s%d%s", "Reader PID: ", id , " en la línea ", linea,", leyó: ");
-    }
-    else if (cont ==1){
-    	fprintf(fptr,"%c",registro);
-    }
-    else{
-    	fprintf(fptr,"\n");
-    }
-    
+    fprintf(fptr,"%s%d%s%d%s%s\n", "Reader PID: ", id , " en la línea ", linea,", leyó: ", registro);
     fclose(fptr);
 }
 

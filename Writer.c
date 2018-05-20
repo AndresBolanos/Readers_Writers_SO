@@ -9,7 +9,7 @@
 #include <time.h>
 #include <stdbool.h>
 
-#define KEY 1090584602
+#define KEY 1091108217
 #define MENSAJE 34
 
 sem_t * sem = NULL; 	//Definimos el semaforo

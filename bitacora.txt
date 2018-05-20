@@ -1,29 +1,23 @@
-Writer PID: 0, escribió: 0-Fri May 18 21:47:07 201-0
-Writer PID: 0, escribió: 0-Fri May 18 21:47:09 201-1
-Writer PID: 0, escribió: 0-Fri May 18 21:47:11 201-2
-Writer PID: 0, escribió: 0-Fri May 18 21:47:13 201-3
-Writer PID: 0, escribió: 0-Sat May 19 12:02:53 201-0
-Writer PID: 0, escribió: 0-Sat May 19 12:03:05 201-1
-Writer PID: 0, escribió: 0-Sat May 19 12:03:16 201-2
-Writer PID: 0, escribió: 0-Sat May 19 12:03:27 201-3
-Writer PID: 0, escribió: 0-Sat May 19 12:03:38 201-4
-Writer PID: 0, escribió: 0-Sat May 19 12:03:49 201-5
-Writer PID: 0, escribió: 0-Sat May 19 12:04:00 201-6
-Writer PID: 1, escribió: 1-Sat May 19 18:10:37 201-0
-Writer PID: 0, escribió: 0-Sat May 19 18:10:38 201-1
-Writer PID: 1, escribió: 1-Sat May 19 18:10:39 201-2
-Writer PID: 0, escribió: 0-Sat May 19 18:10:40 201-3
-Writer PID: 1, escribió: 1-Sat May 19 18:10:41 201-4
-Writer PID: 0, escribió: 0-Sat May 19 18:10:42 201-5
-
-Reader PID: 0, leyó y borró: 
-Reader PID: 0, leyó y borró: 
-Reader PID: 0, leyó y borró: 
-Reader PID: 0, leyó y borró: 
-
-
-
-
-
-
-
+Writer PID: 0, escribió: 0-Sat May 19 23:31:10 201-0
+Writer PID: 1, escribió: 1-Sat May 19 23:31:13 201-1
+Reader PID: 0 en la línea 0, leyó: 0-Sat May 19 23:31:10 201-0*******
+Reader PID: 1 en la línea 0, leyó: 0-Sat May 19 23:31:10 201-0*******
+Writer PID: 0, escribió: 0-Sat May 19 23:31:28 201-2
+Reader PID: 0 en la línea 3, leyó y borró: 
+Reader PID: 1 en la línea 2, leyó y borró: 0-Sat May 19 23:31:28 201-2*******
+Writer PID: 1, escribió: 1-Sat May 19 23:31:37 201-2
+Reader PID: 0 en la línea 1, leyó: 1-Sat May 19 23:31:13 201-1*******
+Reader PID: 1 en la línea 1, leyó: 1-Sat May 19 23:31:13 201-1*******
+Writer PID: 0, escribió: 0-Sat May 19 23:31:46 201-3
+Reader PID: 0 en la línea 1, leyó y borró: 1-Sat May 19 23:31:13 201-1*******
+Reader PID: 1 en la línea 3, leyó y borró: 0-Sat May 19 23:31:46 201-3****
+Writer PID: 1, escribió: 1-Sat May 19 23:31:55 201-1
+Reader PID: 0 en la línea 2, leyó: 1-Sat May 19 23:31:37 201-2*******
+Reader PID: 1 en la línea 2, leyó: 1-Sat May 19 23:31:37 201-2*******
+Writer PID: 0, escribió: 0-Sat May 19 23:32:04 201-3
+Reader PID: 0 en la línea 1, leyó y borró: 1-Sat May 19 23:31:55 201-1*******
+Reader PID: 1 en la línea 3, leyó y borró: 0-Sat May 19 23:32:04 201-3****
+Writer PID: 1, escribió: 1-Sat May 19 23:32:13 201-1
+Writer PID: 0, escribió: 0-Sat May 19 23:32:22 201-3
+Reader PID: 0 en la línea 2, leyó y borró: 1-Sat May 19 23:31:37 201-2*******
+Reader PID: 1 en la línea 0, leyó y borró: 0-Sat May 19 23:31:10 201-0*******

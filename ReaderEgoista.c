@@ -9,7 +9,7 @@
 #include <time.h>
 #include <stdbool.h>
 
-#define KEY 1090584602
+#define KEY 1091108217
 #define MENSAJE 34
 
 sem_t * sem = NULL; 	//Definimos el semaforo
@@ -35,7 +35,7 @@ void ReadMemory(void * reader2){
 		printf("Error!!!  creando la memoria compartida \n");
 		exit(1);
 	}
-    printf("Memoria accesada\n");
+	printf("%s%d\n", "Memoria accesada ", reader1->id);
 
     while(true){
     	//Bloqueo la memoria
@@ -63,33 +63,27 @@ void ReadMemory_aux(struct Reader *reader, char *buffer){
 		printf("Error!!!  No se puede hacer attached\n");
 		exit(1);
 	}
-
 	printf("Memoria lista para leer\n");
 	int lineas = strlen(buffer) / MENSAJE;
 	int posicion = (rand() % lineas);
 	printf("%d\n", posicion);
 	int i;
 	int linea = 0;
-	int cont = 0;
+	registrar_accion("bitacora.txt", reader->id, "",0, posicion);
 	for (i = 0; i < strlen(buffer); i++){
 		if (buffer[i] == ','){
 			linea++;
 		}
 		else if (linea == posicion && buffer[i] != 'X'){
-			printf("LLega aqui");
-			if (cont ==0){
-				registrar_accion("bitacora.txt", reader->id, buffer[i],0);
-				cont= cont+1;
-			}
-			registrar_accion("bitacora.txt", reader->id, buffer[i],1);
+			registrar_accion("bitacora.txt", reader->id, buffer[i], 1, posicion);
 			buffer[i] = 'X';
 		}
 	}
-	registrar_accion("bitacora.txt", reader->id, "",2);
+	registrar_accion("bitacora.txt", reader->id, "",2, posicion);
 }
 
 
-void registrar_accion(char * file_name, int id, char * registro, int cont){
+void registrar_accion(char * file_name, int id, char * registro, int cont, int linea){
     FILE *fptr;
 
     //Se abre con "a" para realizar un append en el archivo
@@ -100,10 +94,10 @@ void registrar_accion(char * file_name, int id, char * registro, int cont){
         exit(1);
     }
     if(cont ==0){
-    	fprintf(fptr,"%s%d%s", "Reader PID: ", id ,", leyó y borró: ");
+    	fprintf(fptr,"%s%d%s%d%s", "Egoista PID: ", id , " en la línea ", linea,", leyó y borró: ");
     }
     else if (cont ==1){
-    	fprintf(fptr,"%s",registro);
+    	fprintf(fptr,"%c",registro);
     }
     else{
     	fprintf(fptr,"\n");
