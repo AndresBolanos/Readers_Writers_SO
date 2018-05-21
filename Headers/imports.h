@@ -15,6 +15,7 @@
 #include "Funciones.h"
 #include "Inicializador.h"
 #include "Writer.h"
+#include "Espia.h"
 
 #include <pthread.h>
 #include <stdbool.h>
@@ -33,8 +34,13 @@
 
 //Variables globales
 #define SEM_NAME        "/Shared_memori"
+#define SEM_EGOISTAS    "/Egoistas"
 #define ID_MEM_FILE     "id_memory.txt"
 #define EGOISTAS       	"egoistas.txt"
+#define BITACORA       	"bitacora.txt"
+#define MEM_EGOISTAS    "procesos_Memoria_Egoista.txt"
+#define MEM_READERS     "procesos_Memoria_Reader.txt"
+#define MEM_WRITERS     "procesos_Memoria_Writer.txt"
 
 
 #endif

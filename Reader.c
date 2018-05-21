@@ -12,7 +12,7 @@
 
 sem_t * sem = NULL; 	//Definimos el semaforo
 
-cantidadReaders =0;
+int cantidadReaders =0;
 char *buffer; // shared buffer
 //Compile the code
 //gcc -w Reader.c Funciones.c  -o Reader -pthread
@@ -38,7 +38,7 @@ void ReadMemory(void * reader2){
 	struct Reader * reader1 = (struct Reader*) reader2;
 	
 	//Se lee la memoria del archivo de texto
-	int key = read_int("id_memory.txt");
+	int key = read_int(ID_MEM_FILE);
 
 	//Se pide la memoria
 	int shmid  = shmget (key,MENSAJE, 0777);
@@ -47,8 +47,6 @@ void ReadMemory(void * reader2){
 		printf("Error!!!  creando la memoria compartida \n");
 		exit(1);
 	}
-
-    printf("Memoria accesada\n");
 
     while (true){
     	 
@@ -64,34 +62,38 @@ void ReadMemory(void * reader2){
 
     	}
 
-    	if (resp){
-    		cantidadReaders= cantidadReaders+1;
-
-			reader1->tiempo = timestamp();
-			ReadMemory_Aux(reader1, buffer);
-			printf("%s%d\n", "LEYENDO ",reader1->id);
-			sleep(reader1->lectura);
-			
-			if(cantidadReaders ==1){
-				//Se desbloquea la memoria
-				desbloquear_sem(sem);
-			}
-			cantidadReaders = cantidadReaders-1;
-			printf("%s%d\n", "DURMIENDO ",reader1->id);
-			sleep(reader1->dormido);
-    	}
-    	else{
-    		printf("No se puede entrar\n");
-			printf("%s%d\n", "DURMIENDO ",reader1->id);
-			sleep(reader1->dormido);
-    	}
+		//Guarda en el archivo "procesos_Memoria_Writer.txt" el id del proceso que esta en memoria
+		if (cantidadReaders >= 1){
+			//Hace append
+			char bufferFile[1];
+			sprintf(bufferFile, "%d\n",reader1->id);
+			save_chain(bufferFile, MEM_READERS,"a");
+		}
+		else{
+			//Sobre escribe
+			char bufferFile[1];
+			sprintf(bufferFile, "%d\n",reader1->id);
+			save_chain(bufferFile, MEM_READERS,"w");
+		}
+		cantidadReaders= cantidadReaders+1;
+		//Hace un append al archivo
+		
+		reader1->tiempo = timestamp();
+		ReadMemory_Aux(reader1, buffer);
+		printf("%s%d\n", "LEYENDO READER ",reader1->id);
+		sleep(reader1->lectura);
+		
+		if(cantidadReaders ==1){
+			//Se desbloquea la memoria
+			desbloquear_sem(sem);
+		}
+		//Aqui hay q borrar del archivo un reader
+		save_chain_Delete(MEM_READERS,cantidadReaders,reader1->id);
+		cantidadReaders = cantidadReaders-1;
+		printf("%s%d\n", "DURMIENDO READER ",reader1->id);
+		sleep(reader1->dormido);
     	
     }
-	//save_state('R', "estado.txt"); //Se guarda en un archivo que un semaforo esta en memori
-
-    // Para usar la memoria hay que hacerle attached
-	
-	//Se desbloquea la memoria
 }
 
 void ReadMemory_Aux(struct Reader *reader, char *buffer){
@@ -100,7 +102,6 @@ void ReadMemory_Aux(struct Reader *reader, char *buffer){
 		exit(1);
 	}
 
-	printf("Memoria lista para leer\n");
 	int i;
 	int linea = 0;
 	int primerChar =0;
@@ -111,7 +112,7 @@ void ReadMemory_Aux(struct Reader *reader, char *buffer){
 		if (buffer[i] == ','){
 			if (buffer[i-1] != 'X' && primerChar != 0){
 				printf("\n");
-				registrar_accion("bitacora.txt", reader->id, lineaMsj, linea);
+				registrar_accion(BITACORA, reader->id, lineaMsj, linea);
 				primerChar =0;
 				reader->linea = linea+1;
 				if(reader->linea == lineas){
@@ -125,7 +126,7 @@ void ReadMemory_Aux(struct Reader *reader, char *buffer){
 			if (reader->linea == linea){
 				if (buffer[i] != 'X'){
 					if (i+1 == strlen(buffer)){
-						registrar_accion("bitacora.txt", reader->id, lineaMsj, linea);
+						registrar_accion(BITACORA, reader->id, lineaMsj, linea);
 						lineaMsj[contadorMsj] = buffer[i];
 						contadorMsj= contadorMsj +1;
 
@@ -142,8 +143,8 @@ void ReadMemory_Aux(struct Reader *reader, char *buffer){
 				else{
 					reader->linea = linea+1;
 					if(reader->linea == lineas){
-					reader->linea=0;
-				}
+						reader->linea=0;
+					}
 				}
 			}
 		}
@@ -181,6 +182,7 @@ void Creador_Readers(int cantidad, int lectura, int dormido){
 		reader1->dormido = dormido;
 		reader1->linea=0;
 		pthread_create (&thread1, NULL, ReadMemory, (void*)reader1);
+		sleep(10);
 
 	}
 	pthread_join(thread1, NULL);

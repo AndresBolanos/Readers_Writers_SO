@@ -41,7 +41,7 @@ void Write_line(void * writer2){
 	struct Writer * writer1 = (struct Writer*) writer2;
 	
 	//Se lee la memoria del archivo de texto
-	int key = read_int("id_memory.txt");
+	int key = read_int(ID_MEM_FILE);
 
 	//Se pide la memoria
 	int shmid  = shmget (key,MENSAJE, 0777);
@@ -49,37 +49,41 @@ void Write_line(void * writer2){
 		printf("Error!!!  creando la memoria compartida \n");
 		exit(1);
 	}
-	
-	printf("%s%d\n", "Memoria accesada ",writer1->id);
 
 	while(true){
 	    //Bloqueo la memoria
 		bool resp = bloquear_sem(sem, 'W');
 		if (resp){
+			//Guarda en el archivo "procesos_Memoria_Writer.txt" el id del proceso que esta en memoria
+			char bufferWriter[1];
+			sprintf(bufferWriter, "%d\n",writer1->id);
+			save_chain(bufferWriter, MEM_WRITERS, "w");
+
 			// Para usar la memoria hay que hacerle attached
 			char *buffer; /* shared buffer */
 			buffer = shmat (shmid , (char *)0 , 0);
 
 			writer1->tiempo = timestamp();
 			Write_line_aux(writer1, buffer);
-			printf("%s%d\n", "ESCRIBIENDO ",writer1->id);
+			printf("%s%d\n", "ESCRIBIENDO WRITER ",writer1->id);
 			sleep(writer1->escribe);
 			
 			//Se desbloquea la memoria
 			desbloquear_sem(sem);
-		
-			printf("%s%d\n", "DURMIENDO ",writer1->id);
+			
+			//Guarda en el archivo "procesos_Memoria_Writer.txt" que salio el proceso
+			save_chain(" ", MEM_WRITERS, "w");
+
+			//Duerme el thread
+			printf("%s%d\n", "DURMIENDO WRITER ",writer1->id);
 			sleep(writer1->dormido);
 		}
 		else{
 			printf("No se puede entrar\n");
-			printf("%s%d\n", "DURMIENDO ",writer1->id);
+			printf("%s%d\n", "DURMIENDO WRITER ",writer1->id);
 			sleep(writer1->dormido);
 		}
-		
-	
 	}
-
 }
 
 void Write_line_aux(struct Writer *writer, char *buffer){
@@ -89,7 +93,6 @@ void Write_line_aux(struct Writer *writer, char *buffer){
 	}
 	char linea[34];
 	Create_Buffer(writer, 10, linea);
-	printf("Memoria lista para escribir\n");
 	
 	//Se escribe en memoria
 	int i;
@@ -101,7 +104,7 @@ void Write_line_aux(struct Writer *writer, char *buffer){
 			if (flag){
 				flag = false;
 				Create_Buffer(writer, num_linea, linea);
-				registrar_accion("bitacora.txt", writer->id, linea);
+				registrar_accion(BITACORA, writer->id, linea);
 			}
 			buffer[i] = linea[cont];
 			cont++;
