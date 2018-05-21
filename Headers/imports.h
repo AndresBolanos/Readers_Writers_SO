@@ -33,6 +33,8 @@
 
 //Variables globales
 #define SEM_NAME        "/Shared_memori"
+#define ID_MEM_FILE     "id_memory.txt"
+#define EGOISTAS       	"egoistas.txt"
 
 
 #endif

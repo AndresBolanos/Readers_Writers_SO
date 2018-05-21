@@ -9,7 +9,6 @@
 #include <time.h>
 #include <stdbool.h>
 
-#define KEY 1090584602
 #define MENSAJE 34
 
 sem_t * sem = NULL; 	//Definimos el semaforo
@@ -40,8 +39,12 @@ char *Create_Buffer(struct Writer *writer, int linea, char *buffer){
 
 void Write_line(void * writer2){
 	struct Writer * writer1 = (struct Writer*) writer2;
+	
+	//Se lee la memoria del archivo de texto
+	int key = read_int("id_memory.txt");
+
 	//Se pide la memoria
-	int shmid  = shmget (KEY,MENSAJE, 0777);
+	int shmid  = shmget (key,MENSAJE, 0777);
 	if (shmid  == -1) {
 		printf("Error!!!  creando la memoria compartida \n");
 		exit(1);
@@ -51,24 +54,29 @@ void Write_line(void * writer2){
 
 	while(true){
 	    //Bloqueo la memoria
-		bloquear_sem(sem);
-		// Para usar la memoria hay que hacerle attached
-		char *buffer; /* shared buffer */
-		buffer = shmat (shmid , (char *)0 , 0);
+		bool resp = bloquear_sem(sem, 'W');
+		if (resp){
+			// Para usar la memoria hay que hacerle attached
+			char *buffer; /* shared buffer */
+			buffer = shmat (shmid , (char *)0 , 0);
 
-		writer1->tiempo = timestamp();
-		Write_line_aux(writer1, buffer);
-		printf("%s%d\n", "ESCRIBIENDO ",writer1->id);
-		sleep(writer1->escribe);
+			writer1->tiempo = timestamp();
+			Write_line_aux(writer1, buffer);
+			printf("%s%d\n", "ESCRIBIENDO ",writer1->id);
+			sleep(writer1->escribe);
+			
+			//Se desbloquea la memoria
+			desbloquear_sem(sem);
 		
-		//Se desbloquea la memoria
-		desbloquear_sem(sem);
-	
-		printf("%s%d\n", "DURMIENDO ",writer1->id);
-		sleep(writer1->dormido);
-	
+			printf("%s%d\n", "DURMIENDO ",writer1->id);
+			sleep(writer1->dormido);
+		}
+		else{
+			printf("No se puede entrar\n");
+			printf("%s%d\n", "DURMIENDO ",writer1->id);
+			sleep(writer1->dormido);
+		}
 	}
-
 }
 
 void Write_line_aux(struct Writer *writer, char *buffer){
@@ -91,6 +99,10 @@ void Write_line_aux(struct Writer *writer, char *buffer){
 				flag = false;
 				Create_Buffer(writer, num_linea, linea);
 				registrar_accion("bitacora.txt", writer->id, linea);
+				//Guarda en el archivo "procesos_Memoria_Writer.txt" el id del proceso que esta en memoria
+				char buffer[1];
+				sprintf(buffer, "%d\n",writer->id);
+				save_chain(buffer, "procesos_Memoria_Writer.txt", "w");
 			}
 			buffer[i] = linea[cont];
 			cont++;
@@ -122,6 +134,7 @@ void registrar_accion(char * file_name, int id, char * registro){
     fprintf(fptr,"%s%d%s%s\n", "Writer PID: ", id ,", escribió: ", registro);
     fclose(fptr);
 }
+
 void Creador_Writers(int cantidad, int escritura, int dormido){
 	char *shm, *s;
 	//Se crea el semaforo
