@@ -38,7 +38,7 @@ void ReadMemory(void * reader2){
 	struct Reader * reader1 = (struct Reader*) reader2;
 	
 	//Se lee la memoria del archivo de texto
-	int key = read_int("id_memory.txt");
+	int key = read_int(ID_MEM_FILE);
 
 	//Se pide la memoria
 	int shmid  = shmget (key,MENSAJE, 0777);
@@ -47,8 +47,6 @@ void ReadMemory(void * reader2){
 		printf("Error!!!  creando la memoria compartida \n");
 		exit(1);
 	}
-
-    printf("Memoria accesada\n");
 
     while (true){
     	 
@@ -69,13 +67,13 @@ void ReadMemory(void * reader2){
 			//Hace append
 			char bufferFile[1];
 			sprintf(bufferFile, "%d\n",reader1->id);
-			save_chain(bufferFile, "procesos_Memoria_Reader.txt","a");
+			save_chain(bufferFile, MEM_READERS,"a");
 		}
 		else{
 			//Sobre escribe
 			char bufferFile[1];
 			sprintf(bufferFile, "%d\n",reader1->id);
-			save_chain(bufferFile, "procesos_Memoria_Reader.txt","w");
+			save_chain(bufferFile, MEM_READERS,"w");
 		}
 		cantidadReaders= cantidadReaders+1;
 		//Hace un append al archivo
@@ -84,7 +82,7 @@ void ReadMemory(void * reader2){
 
 		reader1->tiempo = timestamp();
 		ReadMemory_Aux(reader1, buffer);
-		printf("%s%d\n", "LEYENDO ",reader1->id);
+		printf("%s%d\n", "LEYENDO READER ",reader1->id);
 		sleep(reader1->lectura);
 		
 		if(cantidadReaders ==1){
@@ -93,7 +91,7 @@ void ReadMemory(void * reader2){
 		}
 		//Aqui hay q borrar del archivo un reader
 		cantidadReaders = cantidadReaders-1;
-		printf("%s%d\n", "DURMIENDO ",reader1->id);
+		printf("%s%d\n", "DURMIENDO READER ",reader1->id);
 		sleep(reader1->dormido);
     	
     }
@@ -110,7 +108,6 @@ void ReadMemory_Aux(struct Reader *reader, char *buffer){
 		exit(1);
 	}
 
-	printf("Memoria lista para leer\n");
 	int i;
 	int linea = 0;
 	int primerChar =0;
@@ -121,7 +118,7 @@ void ReadMemory_Aux(struct Reader *reader, char *buffer){
 		if (buffer[i] == ','){
 			if (buffer[i-1] != 'X' && primerChar != 0){
 				printf("\n");
-				registrar_accion("bitacora.txt", reader->id, lineaMsj, linea);
+				registrar_accion(BITACORA, reader->id, lineaMsj, linea);
 				primerChar =0;
 				reader->linea = linea+1;
 				if(reader->linea == lineas){
@@ -135,7 +132,7 @@ void ReadMemory_Aux(struct Reader *reader, char *buffer){
 			if (reader->linea == linea){
 				if (buffer[i] != 'X'){
 					if (i+1 == strlen(buffer)){
-						registrar_accion("bitacora.txt", reader->id, lineaMsj, linea);
+						registrar_accion(BITACORA, reader->id, lineaMsj, linea);
 						lineaMsj[contadorMsj] = buffer[i];
 						contadorMsj= contadorMsj +1;
 

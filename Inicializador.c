@@ -70,6 +70,14 @@ void Create_Memory(char * memory_name, int memory_key, int lines_memory){
 			}
 		}	
 		//Se desbloquea la memoria
+		//Se limpian los archivos
+		//Se borra q hay un egoista en memoria
+		save_chain(" ", MEM_EGOISTAS,"w");
+		save_chain(" ", MEM_READERS,"w");
+		save_chain(" ", MEM_WRITERS ,"w");
+		save_chain(" ", BITACORA ,"w");
+		save_int(0,EGOISTAS);
+
 		desbloquear_sem(sem);	
 	}
 	else{

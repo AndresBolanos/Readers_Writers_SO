@@ -6,6 +6,7 @@
 // Semaforos
 void * solicitar_sem(char * nombre_sem);
 bool bloquear_sem(void * sem_ref, char tipo);
+void bloquear_sem_sencillo(void * sem_ref);
 void desbloquear_sem(void * sem_ref);
 void cerrar_sem(void * sem_ref);
 

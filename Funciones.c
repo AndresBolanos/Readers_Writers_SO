@@ -33,18 +33,29 @@ bool bloquear_sem(void * sem_ref, char tipo)
     sem_t * sem = (sem_t *) sem_ref;
     int result = 0;
 
-    printf("Bloqueando semaforo...");
+    printf("Bloqueando semaforo...\n");
 
+    //Bloqueo cuando escribo con semaforo
+    char *shm_egoista;
+
+    //Se crea el semaforo para el archivo
+    shm_egoista = (sem_t *) solicitar_sem(SEM_EGOISTAS);
+
+    //Se bloquea el semaforo del archivo
+    bloquear_sem_sencillo(shm_egoista);
     int egoistas = read_int(EGOISTAS);
     if (tipo == 'E'){
-        
         egoistas += 1;
         //Se guarda en el archivo el id de la memoria
         save_int(egoistas,EGOISTAS);
     }
     else{
+        egoistas = 0;
         save_int(0,EGOISTAS);
     }
+    //Se desbloquea el semaforo de entrada al archivo
+    desbloquear_sem(shm_egoista);
+
     if (egoistas <= 2){
         //if (read_state("estado.txt") != 'R'){
         result = sem_wait(sem);
@@ -54,25 +65,39 @@ bool bloquear_sem(void * sem_ref, char tipo)
             exit(2);
             return false;
         }
-        printf("Semaforo tipo %c\n", tipo);
-        printf("OK\n");
+        printf("Semaforo tipo %c bloqueado\n", tipo);
         return true;
     }
     else{
          printf("Hay mas de dos readers egoistas seguidos\n");  
          return false; 
+    }    
+}
+
+//Semaforo sencillo, no verfica, solo bloquea
+void bloquear_sem_sencillo(void * sem_ref)
+{
+    sem_t * sem = (sem_t *) sem_ref;
+    int result = 0;
+    //printf("Bloqueando semaforo...");
+
+    result = sem_wait(sem);
+        if (result == -1)
+    {
+        //printf("ERROR\n");
+        exit(2);
     }
-    
+    //printf("OK\n");
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
-
+//Desbloquea un semafoto
 void desbloquear_sem(void * sem_ref)
 {
     sem_t * sem = (sem_t *) sem_ref;
     int result;
 
-    printf("Desbloqueando semaforo...");
+    printf("Desbloqueando semaforo...\n");
 
     result = sem_post(sem);
     if (result == -1)
@@ -80,7 +105,6 @@ void desbloquear_sem(void * sem_ref)
         printf("ERROR\n");
         exit(2);
     }
-    printf("OK\n");
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -126,8 +150,6 @@ void save_state(char sem, char * file_name)
     fclose(file);
 }
 
-
-
 char read_state(char * file_name)
 {
     FILE *file;
@@ -144,7 +166,7 @@ char read_state(char * file_name)
     }
 }
 
-//Guardar el id de la memoria
+//Guarda un entero
 void save_int(int num, char * file_name)
 {
     FILE *file = fopen(file_name, "w");
@@ -158,7 +180,7 @@ void save_int(int num, char * file_name)
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
-
+//Lee un entero
 int read_int(char * file_name)
 {
     FILE *file;
@@ -176,7 +198,7 @@ int read_int(char * file_name)
     
 }
 
-//Guardar el estado de un proceso de la memoria
+//Guarda una cadena de caracteres
 void save_chain(char * cadena, char * file_name, char * tipo_escritura)
 {
     FILE *file = fopen(file_name, tipo_escritura);
@@ -191,7 +213,7 @@ void save_chain(char * cadena, char * file_name, char * tipo_escritura)
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
-
+//Lee una cadena de caracteres
 int read_chain(char * file_name)
 {
     FILE *file;
