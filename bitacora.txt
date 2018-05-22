@@ -1,0 +1,11 @@
+ Writer PID: 2, escribió: 2-Tue May 22 10:09:48 201-0
+Writer PID: 1, escribió: 1-Tue May 22 10:09:50 201-1
+Writer PID: 3, escribió: 3-Tue May 22 10:09:52 201-2
+Reader PID: 0 en la línea 0, leyó: 2-Tue May 22 10:09:48 201-0******
+Reader PID: 1 en la línea 0, leyó: 2-Tue May 22 10:09:48 201-0******
+Reader PID: 0 en la línea 1, leyó: 1-Tue May 22 10:09:50 201-1******
+Reader PID: 2 en la línea 0, leyó: 2-Tue May 22 10:09:48 201-0******
+Reader PID: 1 en la línea 1, leyó: 1-Tue May 22 10:09:50 201-1******
+Reader PID: 0 en la línea 2, leyó: 3-Tue May 22 10:09:52 201-2******
+Reader PID: 2 en la línea 1, leyó: 1-Tue May 22 10:09:50 201-1******
+Reader PID: 1 en la línea 2, leyó: 3-Tue May 22 10:09:52 201-2******
