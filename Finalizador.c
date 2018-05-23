@@ -13,8 +13,16 @@ void finalizar()
     int shm_id = KEY;
 
     /*Eliminacion de los procesos del productor*/
-    system("killall prod");
-    printf("\nProcesos eliminados\n");
+    system("killall Writer");
+    printf("\nProcesos Writer eliminados\n");
+
+    /*Eliminacion de los procesos del productor*/
+    system("killall Reader");
+    printf("\nProcesos Reader eliminados\n");
+
+    /*Eliminacion de los procesos del productor*/
+    system("killall ReaderEgoista");
+    printf("\nProcesos Egoista eliminados\n");
 
     /*Eliminacion de la memoria compartida simulada*/
     if (shmctl(shm_id, IPC_RMID, 0) != -1)

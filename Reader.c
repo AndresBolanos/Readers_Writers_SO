@@ -12,8 +12,15 @@
 
 sem_t * sem = NULL; 	//Definimos el semaforo
 
+sem_t * semF = NULL; 	//Definimos el semaforo
+
 int cantidadReaders =0;
 char *buffer; // shared buffer
+
+int totalReaders;
+int estados[100]; 	//Arreglo con el estado el reader. 3 memoria, 2 dormido, 1 bloqueado, 0 desbloqueado.
+
+
 //Compile the code
 //gcc -w Reader.c Funciones.c  -o Reader -pthread
 //./Reader
@@ -33,6 +40,90 @@ char* timestamp(){
   return asctime(localtime(&ltime));
 }
 
+void Cargar_bloqueados(){
+	FILE *fptr;
+	bloquear_sem_sencillo(semF);
+    fptr = fopen("procesos_Bloqueados_Reader.txt", "w");
+    if(fptr == NULL)
+    {
+        printf("Error opening file!");
+        exit(1);
+    }
+
+    int i;
+    int flag = 0;
+    for (i = 0; i <= totalReaders; i++){
+    	if(estados[i] == 1){
+    		fprintf(fptr,"%d\n", i);
+    		flag = 1;
+    	}
+    }
+    if (flag == 0){
+    	fprintf(fptr,"%s", "*");
+    }
+    fclose(fptr);
+    desbloquear_sem(semF);
+}
+
+void Cargar_dormidos(){
+	FILE *fptr;
+	bloquear_sem_sencillo(semF);
+    fptr = fopen("procesos_Dormidos_Reader.txt", "w");
+    if(fptr == NULL)
+    {
+        printf("Error opening file!");
+        exit(1);
+    }
+
+    int i;
+    int flag = 0;
+    for (i = 0; i <= totalReaders; i++){
+    	if(estados[i] == 2){
+    		fprintf(fptr,"%d\n", i);
+    		flag = 1;
+    	}
+    }
+    if (flag == 0){
+    	fprintf(fptr,"%s", "*");
+    }
+    fclose(fptr);
+    desbloquear_sem(semF);
+}
+
+bool writer_bloqueados(){
+	bool respuesta = true;
+	bloquear_sem_sencillo(semF);
+	FILE *file;
+    char buff;
+    file = fopen("procesos_Bloqueados_Writer.txt", "r");
+    if (file){
+        buff = (char)fgetc(file);
+        fclose(file);
+        if (buff == '*'){
+        	respuesta = false;
+        }
+    }
+	desbloquear_sem(semF);
+	return respuesta;
+}
+
+bool egoista_bloqueados(){
+	bool respuesta = true;
+	bloquear_sem_sencillo(semF);
+	FILE *file;
+    char buff;
+    file = fopen("procesos_Bloqueados_Egoista.txt", "r");
+    if (file){
+        buff = (char)fgetc(file);
+        fclose(file);
+        if (buff == '*'){
+        	respuesta = false;
+        }
+    }
+	desbloquear_sem(semF);
+	return respuesta;
+}
+
 void ReadMemory(void * reader2){
 
 	struct Reader * reader1 = (struct Reader*) reader2;
@@ -50,46 +141,65 @@ void ReadMemory(void * reader2){
 
     while (true){
     	 
-
-    	//Bloqueo la memoria
-    	bool resp = false;
-    	if (cantidadReaders ==0){
-    		resp = bloquear_sem(sem,'R');
-    		buffer = shmat (shmid , (char *)0 , 0);
+    	bool respuesta = writer_bloqueados();
+    	bool respuesta2 = egoista_bloqueados();
+    	if (respuesta && respuesta2){
+    		printf("%s\n", "WRITER BLOQUEADO");
     	}
+    	else{
+    		//Bloqueo la memoria
+	    	bool resp = false;
 
-    	while(buffer == NULL){
+	    	if (cantidadReaders ==0){
+	    		estados[reader1->id] = 1; //bloqueado
+	    		Cargar_dormidos();
+	    		Cargar_bloqueados();
+	    		resp = bloquear_sem(sem,'R');
+	    		buffer = shmat (shmid , (char *)0 , 0);
+	    	}
+
+	    	while(buffer == NULL){
+
+	    	}
+	    	cantidadReaders= cantidadReaders+1;
+	    	estados[reader1->id] = 3; //memoria
+	    	Cargar_dormidos();
+	    	Cargar_bloqueados();
+
+			//Guarda en el archivo "procesos_Memoria_Writer.txt" el id del proceso que esta en memoria
+			if (cantidadReaders > 1){
+				//Hace append
+				char bufferFile[1];
+				sprintf(bufferFile, "%d\n",reader1->id);
+				save_chain(bufferFile, MEM_READERS,"a");
+			}
+			else{
+				//Sobre escribe
+				char bufferFile[1];
+				sprintf(bufferFile, "%d\n",reader1->id);
+				save_chain(bufferFile, MEM_READERS,"w");
+			}
+			//Hace un append al archivo
+			
+			reader1->tiempo = timestamp();
+			ReadMemory_Aux(reader1, buffer);
+			printf("%s%d\n", "LEYENDO READER ",reader1->id);
+			sleep(reader1->lectura);
+			
+			if(cantidadReaders ==1){
+				//Se desbloquea la memoria
+				desbloquear_sem(sem);
+			}
+			//Aqui hay q borrar del archivo un reader
+			save_chain_Delete(MEM_READERS,cantidadReaders,reader1->id);
+			cantidadReaders = cantidadReaders-1;
 
     	}
+		
+		estados[reader1->id] = 2; //dormido
+    	Cargar_dormidos();
+    	Cargar_bloqueados();
 
-		//Guarda en el archivo "procesos_Memoria_Writer.txt" el id del proceso que esta en memoria
-		if (cantidadReaders >= 1){
-			//Hace append
-			char bufferFile[1];
-			sprintf(bufferFile, "%d\n",reader1->id);
-			save_chain(bufferFile, MEM_READERS,"a");
-		}
-		else{
-			//Sobre escribe
-			char bufferFile[1];
-			sprintf(bufferFile, "%d\n",reader1->id);
-			save_chain(bufferFile, MEM_READERS,"w");
-		}
-		cantidadReaders= cantidadReaders+1;
-		//Hace un append al archivo
-		
-		reader1->tiempo = timestamp();
-		ReadMemory_Aux(reader1, buffer);
-		printf("%s%d\n", "LEYENDO READER ",reader1->id);
-		sleep(reader1->lectura);
-		
-		if(cantidadReaders ==1){
-			//Se desbloquea la memoria
-			desbloquear_sem(sem);
-		}
-		//Aqui hay q borrar del archivo un reader
-		save_chain_Delete(MEM_READERS,cantidadReaders,reader1->id);
-		cantidadReaders = cantidadReaders-1;
 		printf("%s%d\n", "DURMIENDO READER ",reader1->id);
 		sleep(reader1->dormido);
     	
@@ -166,9 +276,11 @@ void registrar_accion(char * file_name, int id, char * registro, int linea){
 }
 
 void Creador_Readers(int cantidad, int lectura, int dormido){
+	totalReaders=cantidad;
 	char *shm, *s;
 	//Se crea el semaforo
 	sem = (sem_t *) solicitar_sem(SEM_NAME);
+	semF = (sem_t *) solicitar_sem(SEM_FILE_WRITERS);
 	pthread_t thread1;
 	int i;
 	for (i = 0; i < cantidad; i++){

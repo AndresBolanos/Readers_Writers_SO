@@ -12,6 +12,10 @@
 #define MENSAJE 34
 
 sem_t * sem = NULL; 	//Definimos el semaforo
+sem_t * semF = NULL; 	//Definimos el semaforo
+
+int cantidadEgoistas;
+int estados[100]; 	//Arreglo con el estado del reader. 3 memoria, 2 dormido, 1 bloqueado, 0 desbloqueado.
 
 struct Reader
 {
@@ -27,11 +31,61 @@ char* timestamp(){
   return asctime(localtime(&ltime));
 }
 
+void Cargar_bloqueados(){
+	FILE *fptr;
+	bloquear_sem_sencillo(semF);
+    fptr = fopen("procesos_Bloqueados_Egoista.txt", "w");
+    if(fptr == NULL)
+    {
+        printf("Error opening file!");
+        exit(1);
+    }
+
+    int i;
+    int flag = 0;
+    for (i = 0; i <= cantidadEgoistas; i++){
+    	if(estados[i] == 1){
+    		fprintf(fptr,"%d\n", i);
+    		flag = 1;
+    	}
+    }
+    if (flag == 0){
+    	fprintf(fptr,"%s", "*");
+    }
+    fclose(fptr);
+    desbloquear_sem(semF);
+}
+
+void Cargar_dormidos(){
+	FILE *fptr;
+	bloquear_sem_sencillo(semF);
+    fptr = fopen("procesos_Dormidos_Egoista.txt", "w");
+    if(fptr == NULL)
+    {
+        printf("Error opening file!");
+        exit(1);
+    }
+
+    int i;
+    int flag = 0;
+    for (i = 0; i <= cantidadEgoistas; i++){
+    	if(estados[i] == 2){
+    		fprintf(fptr,"%d\n", i);
+    		flag = 1;
+    	}
+    }
+    if (flag == 0){
+    	fprintf(fptr,"%s", "*");
+    }
+    fclose(fptr);
+    desbloquear_sem(semF);
+}
+
 void ReadMemory(void * reader2){
 	struct Reader * reader1 = (struct Reader*) reader2;
 
 	//Se lee la memoria del archivo de texto
-	int key = read_int(BITACORA);
+	int key = read_int(ID_MEM_FILE );
 
 	int shmid  = shmget (key,MENSAJE, 0777);
 	if (shmid  == -1) {
@@ -40,6 +94,11 @@ void ReadMemory(void * reader2){
 	}
 
     while(true){
+
+    	estados[reader1->id] = 1; //bloqueado
+		Cargar_bloqueados();
+		Cargar_dormidos();
+
     	//Bloqueo la memoria
 		bool resp = bloquear_sem(sem, 'E');
 		if (resp){
@@ -53,6 +112,9 @@ void ReadMemory(void * reader2){
 			char *buffer; /* shared buffer */
 			buffer = shmat (shmid , (char *)0 , 0);
 
+			estados[reader1->id] = 3; //en memoria
+			Cargar_bloqueados();
+
 			reader1->tiempo = timestamp();
 			ReadMemory_aux(reader1, buffer);
 			
@@ -65,10 +127,16 @@ void ReadMemory(void * reader2){
 			//Se desbloquea la memoria
 			desbloquear_sem(sem);
 
+			estados[reader1->id] = 2; //durmiendo
+			Cargar_dormidos();
+
 			printf("%s%d\n", "DURMIENDO READER",reader1->id);
 			sleep(reader1->dormido);
 		}
 		else{
+			estados[reader1->id] = 2; //durmiendo
+			Cargar_dormidos();
+
 			printf("No se puede entrar\n");
 			printf("%s%d\n", "DURMIENDO READER",reader1->id);
 			sleep(reader1->dormido);
@@ -124,14 +192,17 @@ void registrar_accion(char * file_name, int id, char * registro, int cont, int l
 }
 
 void Creador_Readers_Egoistas(int cantidad, int lectura, int dormido){ 
+	cantidadEgoistas = cantidad;
 	char *shm, *s;
 	sem = (sem_t *) solicitar_sem(SEM_NAME);
+	semF = (sem_t *) solicitar_sem(SEM_FILE_WRITERS);
+
 	pthread_t thread1;
 	int i;
 	for (i = 0; i < cantidad; i++){
 		struct Reader *reader1; // = {i,0, timestamp(), escritura, dormido};
 		reader1 = malloc(sizeof(Reader));
-		reader1->id = i;
+		reader1->id = i+1;
 		reader1->tiempo = timestamp();
 		reader1->lectura = lectura;
 		reader1->dormido = dormido;

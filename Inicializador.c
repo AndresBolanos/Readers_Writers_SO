@@ -17,6 +17,7 @@ void Create_Memory(char * memory_name, int memory_key, int lines_memory){
 	//Crea la llave unica
 	// buffer[lines_memory][5];
 	sem_t * sem = NULL;
+	sem_t * semF = NULL;
 
 	int key = ftok(memory_name, memory_key);
 	printf("La llave de la memoria es %d\n",key );
@@ -31,6 +32,7 @@ void Create_Memory(char * memory_name, int memory_key, int lines_memory){
 
 	//Se crea el semaforo
 	sem = (sem_t *) solicitar_sem(SEM_NAME);
+	semF = (sem_t *) solicitar_sem(SEM_FILE_WRITERS);
 	//Se guarda que hay cero egoistas en memoria
 	save_int(0,EGOISTAS);
 

@@ -35,6 +35,7 @@
 //Variables globales
 #define SEM_NAME        "/Shared_memori"
 #define SEM_EGOISTAS    "/Egoistas"
+#define SEM_FILE_WRITERS    "/Egoistas"
 #define ID_MEM_FILE     "id_memory.txt"
 #define EGOISTAS       	"egoistas.txt"
 #define BITACORA       	"bitacora.txt"
