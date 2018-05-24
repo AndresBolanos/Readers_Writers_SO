@@ -1,20 +1,17 @@
- Writer PID: 1, escribió: 1-Wed May 23 10:34:17 201-0
-Writer PID: 3, escribió: 3-Wed May 23 10:34:22 201-1
-Writer PID: 2, escribió: 2-Wed May 23 10:34:27 201-2
-Writer PID: 1, escribió: 1-Wed May 23 10:34:32 201-3
-Egoista PID: 1 en la línea 3, leyó y borró: 1-Wed May 23 10:34:32 201-3******
-Egoista PID: 2 en la línea 1, leyó y borró: 3-Wed May 23 10:34:22 201-1******
-Reader PID: 1 en la línea 0, leyó: 1-Wed May 23 10:34:17 201-0******
-Reader PID: 0 en la línea 0, leyó: 1-Wed May 23 10:34:17 201-0******
-Writer PID: 3, escribió: 3-Wed May 23 10:34:59 201-1
-Writer PID: 2, escribió: 2-Wed May 23 10:35:04 201-3
-Egoista PID: 3 en la línea 2, leyó y borró: 2-Wed May 23 10:34:27 201-2******
-Writer PID: 1, escribió: 1-Wed May 23 10:35:15 201-2
-Egoista PID: 1 en la línea 0, leyó y borró: 1-Wed May 23 10:34:17 201-0******
-Egoista PID: 2 en la línea 3, leyó y borró: 2-Wed May 23 10:35:04 201-3******
-Writer PID: 3, escribió: 3-Wed May 23 10:35:32 201-0
-Writer PID: 2, escribió: 2-Wed May 23 10:35:37 201-3
-Egoista PID: 3 en la línea 0, leyó y borró: 3-Wed May 23 10:35:32 201-0******
-Writer PID: 1, escribió: 1-Wed May 23 10:35:48 201-0
-Egoista PID: 1 en la línea 1, leyó y borró: 3-Wed May 23 10:34:59 201-1******
-Egoista PID: 2 en la línea 2, leyó y borró: 1-Wed May 23 10:35:15 201-2******
+ Writer PID: 1, escribió: 1-Wed May 23 19:08:06 201-0
+Writer PID: 2, escribió: 2-Wed May 23 19:08:11 201-1
+Egoista PID: 1 en la línea 3, leyó y borró: 
+Egoista PID: 2 en la línea 1, leyó y borró: 2-Wed May 23 19:08:11 201-1******
+Writer PID: 1, escribió: 1-Wed May 23 19:08:28 201-1
+Reader PID: 0 en la línea 0, leyó: 1-Wed May 23 19:08:06 201-0******
+Writer PID: 2, escribió: 2-Wed May 23 19:08:37 201-2
+Egoista PID: 1 en la línea 2, leyó y borró: 2-Wed May 23 19:08:37 201-2******
+Reader PID: 1 en la línea 0, leyó: 1-Wed May 23 19:08:06 201-0******
+Reader PID: 0 en la línea 1, leyó: 1-Wed May 23 19:08:28 201-1******
+Egoista PID: 2 en la línea 0, leyó y borró: 1-Wed May 23 19:08:06 201-0******
+Writer PID: 1, escribió: 1-Wed May 23 19:09:02 201-0
+Writer PID: 2, escribió: 2-Wed May 23 19:09:07 201-2
+Reader PID: 1 en la línea 1, leyó: 1-Wed May 23 19:08:28 201-1******
+Reader PID: 0 en la línea 2, leyó: 2-Wed May 23 19:09:07 201-2******
+Egoista PID: 1 en la línea 3, leyó y borró: 
+Egoista PID: 2 en la línea 0, leyó y borró: 1-Wed May 23 19:09:02 201-0******
