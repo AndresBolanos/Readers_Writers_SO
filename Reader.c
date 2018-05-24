@@ -90,12 +90,12 @@ void Cargar_dormidos(){
     desbloquear_sem(semF);
 }
 
-bool writer_bloqueados(){
+bool writer_bloqueados(char * nombre_archivo){
 	bool respuesta = true;
 	bloquear_sem_sencillo(semF);
 	FILE *file;
     char buff;
-    file = fopen("procesos_Bloqueados_Writer.txt", "r");
+    file = fopen(nombre_archivo, "r");
     if (file){
         buff = (char)fgetc(file);
         fclose(file);
@@ -107,22 +107,6 @@ bool writer_bloqueados(){
 	return respuesta;
 }
 
-bool egoista_bloqueados(){
-	bool respuesta = true;
-	bloquear_sem_sencillo(semF);
-	FILE *file;
-    char buff;
-    file = fopen("procesos_Bloqueados_Egoista.txt", "r");
-    if (file){
-        buff = (char)fgetc(file);
-        fclose(file);
-        if (buff == '*'){
-        	respuesta = false;
-        }
-    }
-	desbloquear_sem(semF);
-	return respuesta;
-}
 
 void ReadMemory(void * reader2){
 
@@ -141,69 +125,66 @@ void ReadMemory(void * reader2){
 
     while (true){
     	 
-    	bool respuesta = writer_bloqueados();
-    	bool respuesta2 = egoista_bloqueados();
-    	if (respuesta && respuesta2){
-    		printf("%s\n", "WRITER BLOQUEADO");
+    	//true si hay bloqueados, false lo contrario
+    	bool respuesta = writer_bloqueados("procesos_Bloqueados_Writer.txt");
+    	bool respuesta2 = writer_bloqueados("procesos_Bloqueados_Egoista.txt");
+    	
+    	//Bloqueo la memoria
+    	bool resp = false;
+
+    	if ((cantidadReaders ==0) || (respuesta || respuesta2)){
+    		estados[reader1->id] = 1; //bloqueado
+    		Cargar_dormidos();
+    		Cargar_bloqueados();
+    		resp = bloquear_sem(sem,'R');
+    		buffer = shmat (shmid , (char *)0 , 0);
     	}
-    	else{
-    		//Bloqueo la memoria
-	    	bool resp = false;
 
-	    	if (cantidadReaders ==0){
-	    		estados[reader1->id] = 1; //bloqueado
-	    		Cargar_dormidos();
-	    		Cargar_bloqueados();
-	    		resp = bloquear_sem(sem,'R');
-	    		buffer = shmat (shmid , (char *)0 , 0);
-	    	}
-
-	    	while(buffer == NULL){
-
-	    	}
-	    	cantidadReaders= cantidadReaders+1;
-	    	estados[reader1->id] = 3; //memoria
-	    	Cargar_dormidos();
-	    	Cargar_bloqueados();
-
-			//Guarda en el archivo "procesos_Memoria_Writer.txt" el id del proceso que esta en memoria
-			if (cantidadReaders > 1){
-				//Hace append
-				char bufferFile[1];
-				sprintf(bufferFile, "%d\n",reader1->id);
-				save_chain(bufferFile, MEM_READERS,"a");
-			}
-			else{
-				//Sobre escribe
-				char bufferFile[1];
-				sprintf(bufferFile, "%d\n",reader1->id);
-				save_chain(bufferFile, MEM_READERS,"w");
-			}
-			//Hace un append al archivo
-			
-			reader1->tiempo = timestamp();
-			ReadMemory_Aux(reader1, buffer);
-			printf("%s%d\n", "LEYENDO READER ",reader1->id);
-			sleep(reader1->lectura);
-			
-			if(cantidadReaders ==1){
-				//Se desbloquea la memoria
-				desbloquear_sem(sem);
-			}
-			//Aqui hay q borrar del archivo un reader
-			save_chain_Delete(MEM_READERS,cantidadReaders,reader1->id);
-			cantidadReaders = cantidadReaders-1;
+    	while(buffer == NULL){
 
     	}
-		
-		estados[reader1->id] = 2; //dormido
+
+    	cantidadReaders= cantidadReaders+1;
+    	estados[reader1->id] = 3; //memoria
     	Cargar_dormidos();
     	Cargar_bloqueados();
 
-		printf("%s%d\n", "DURMIENDO READER ",reader1->id);
-		sleep(reader1->dormido);
-    	
-    }
+		//Guarda en el archivo "procesos_Memoria_Writer.txt" el id del proceso que esta en memoria
+		if (cantidadReaders > 1){
+			//Hace append
+			char bufferFile[1];
+			sprintf(bufferFile, "%d\n",reader1->id);
+			save_chain(bufferFile, MEM_READERS,"a");
+		}
+		else{
+			//Sobre escribe
+			char bufferFile[1];
+			sprintf(bufferFile, "%d\n",reader1->id);
+			save_chain(bufferFile, MEM_READERS,"w");
+		}
+		//Hace un append al archivo
+		
+		reader1->tiempo = timestamp();
+		ReadMemory_Aux(reader1, buffer);
+		printf("%s%d\n", "LEYENDO READER ",reader1->id);
+		sleep(reader1->lectura);
+		
+		if(cantidadReaders ==1){
+			//Se desbloquea la memoria
+			desbloquear_sem(sem);
+		}
+		//Aqui hay q borrar del archivo un reader
+		save_chain_Delete(MEM_READERS,cantidadReaders,reader1->id);
+		cantidadReaders = cantidadReaders-1;
+
+	}
+	
+	estados[reader1->id] = 2; //dormido
+	Cargar_dormidos();
+	Cargar_bloqueados();
+
+	printf("%s%d\n", "DURMIENDO READER ",reader1->id);
+	sleep(reader1->dormido);
 }
 
 void ReadMemory_Aux(struct Reader *reader, char *buffer){
