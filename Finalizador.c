@@ -36,6 +36,10 @@ void finalizar()
     if (sem_unlink(SEM_EGOISTAS) == 0)
         printf("\nSemaforo de memoria compartido eliminado\n");
 
+    /*Eliminacion del semaforo de los egoistas*/
+    if (sem_unlink(SEM_FILE_WRITERS) == 0)
+        printf("\nSemaforo de memoria compartido eliminado\n");
+
 }
 
 

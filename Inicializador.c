@@ -78,6 +78,12 @@ void Create_Memory(char * memory_name, int memory_key, int lines_memory){
 		save_chain(" ", MEM_READERS,"w");
 		save_chain(" ", MEM_WRITERS ,"w");
 		save_chain(" ", BITACORA ,"w");
+		save_chain(" ", DORM_WRITERS ,"w");
+		save_chain(" ", BLOQ_WRITERS ,"w");
+		save_chain(" ", BLOQ_READERS ,"w");
+		save_chain(" ", DORM_READERS ,"w");
+		save_chain(" ", DORM_EGOISTA ,"w");
+		save_chain(" ", BLOQ_EGOISTA ,"w");
 		save_int(0,EGOISTAS);
 
 		desbloquear_sem(sem);	

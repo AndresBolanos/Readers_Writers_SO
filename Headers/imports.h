@@ -42,6 +42,14 @@
 #define MEM_EGOISTAS    "procesos_Memoria_Egoista.txt"
 #define MEM_READERS     "procesos_Memoria_Reader.txt"
 #define MEM_WRITERS     "procesos_Memoria_Writer.txt"
+#define DORM_WRITERS    "procesos_Dormidos_Writer.txt"
+#define BLOQ_WRITERS    "procesos_Bloqueados_Writer.txt"
+#define BLOQ_READERS    "procesos_Bloqueados_Reader.txt"
+#define DORM_READERS    "procesos_Dormidos_Reader.txt"
+#define DORM_EGOISTA    "procesos_Dormidos_Egoista.txt"
+#define BLOQ_EGOISTA    "procesos_Bloqueados_Egoista.txt"
+
+
 
 
 #endif

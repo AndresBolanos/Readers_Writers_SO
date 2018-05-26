@@ -48,7 +48,7 @@ char *Create_Buffer(struct Writer *writer, int linea, char *buffer){
 void Cargar_bloqueados(){
 	FILE *fptr;
 	bloquear_sem_sencillo(semF);
-    fptr = fopen("procesos_Bloqueados_Writer.txt", "w");
+    fptr = fopen(BLOQ_WRITERS, "w");
     if(fptr == NULL)
     {
         printf("Error opening file!");
@@ -73,7 +73,7 @@ void Cargar_bloqueados(){
 void Cargar_dormidos(){
 	FILE *fptr;
 	bloquear_sem_sencillo(semF);
-    fptr = fopen("procesos_Dormidos_Writer.txt", "w");
+    fptr = fopen(DORM_WRITERS, "w");
     if(fptr == NULL)
     {
         printf("Error opening file!");

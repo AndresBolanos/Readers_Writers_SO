@@ -34,7 +34,7 @@ char* timestamp(){
 void Cargar_bloqueados(){
 	FILE *fptr;
 	bloquear_sem_sencillo(semF);
-    fptr = fopen("procesos_Bloqueados_Egoista.txt", "w");
+    fptr = fopen(BLOQ_EGOISTA, "w");
     if(fptr == NULL)
     {
         printf("Error opening file!");
@@ -59,7 +59,7 @@ void Cargar_bloqueados(){
 void Cargar_dormidos(){
 	FILE *fptr;
 	bloquear_sem_sencillo(semF);
-    fptr = fopen("procesos_Dormidos_Egoista.txt", "w");
+    fptr = fopen(DORM_EGOISTA, "w");
     if(fptr == NULL)
     {
         printf("Error opening file!");
