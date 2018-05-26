@@ -1,17 +1,1 @@
- Writer PID: 3, escribió: 3-Fri May 25 20:46:02 201-0
-Writer PID: 2, escribió: 2-Fri May 25 20:46:08 201-1
-Writer PID: 1, escribió: 1-Fri May 25 20:46:14 201-2
-Reader PID: 0 en la línea 0, leyó: 3-Fri May 25 20:46:02 201-0******Yˁ�
-Writer PID: 3, escribió: 3-Fri May 25 20:46:25 201-3
-Writer PID: 2, escribió: 2-Fri May 25 20:46:31 201-4
-Reader PID: 1 en la línea 0, leyó: 3-Fri May 25 20:46:02 201-0******IK��
-Reader PID: 0 en la línea 1, leyó: 2-Fri May 25 20:46:08 201-1******Yˁ�
-Reader PID: 0 en la línea 2, leyó: 1-Fri May 25 20:46:14 201-2******Yˁ�
-Egoista PID: 3 en la línea 13, leyó y borró: 
-Egoista PID: 1 en la línea 1, leyó y borró: 2-Fri May 25 20:46:08 201-1******
-Reader PID: 2 en la línea 0, leyó: 3-Fri May 25 20:46:02 201-0******9ˀ�
-Egoista PID: 2 en la línea 12, leyó y borró: 
-Writer PID: 3, escribió: 3-Fri May 25 20:47:12 201-1
-Reader PID: 1 en la línea 1, leyó: 3-Fri May 25 20:47:12 201-1******IK��
-Reader PID: 1 en la línea 2, leyó: 1-Fri May 25 20:46:14 201-2******IK��
-Writer PID: 1, escribió: 1-Fri May 25 20:47:28 201-5
+ 

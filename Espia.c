@@ -105,29 +105,36 @@ int main(int argc, char const *argv[])
 {
 	semF = (sem_t *) solicitar_sem(SEM_FILE_WRITERS);
 	int option;
-	printf("Que desea consultar\n");
-	printf("1. Estado del archivo\n");
-	printf("2. Estado de los Writers\n");
-	printf("3. Estado de los Readers\n");
-	printf("4. Estado de los Readers Egoistas\n");
-	scanf("%d",&option);
-	if (option == 1){
-		memory_State();
+	while(true){
+		printf("Que desea consultar\n");
+		printf("1. Estado del archivo\n");
+		printf("2. Estado de los Writers\n");
+		printf("3. Estado de los Readers\n");
+		printf("4. Estado de los Readers Egoistas\n");
+		printf("5. Salir\n");
+		scanf("%d",&option);
+		if (option == 1){
+			memory_State();
+		}
+		else if(option ==2){
+			memoria(MEM_WRITERS);
+			bloqueados(BLOQ_WRITERS);
+			dormidos(DORM_WRITERS);
+		}
+		else if (option ==3){
+			memoria(MEM_READERS);
+			bloqueados(BLOQ_READERS);
+			dormidos(DORM_READERS);
+		}
+		else if (option ==4){
+			memoria(MEM_EGOISTAS);
+			bloqueados(BLOQ_EGOISTA);
+			dormidos(DORM_EGOISTA);
+		}
+		else{
+			exit(1);
+		}
 	}
-	else if(option ==2){
-		memoria("procesos_Memoria_Writer.txt");
-		bloqueados("procesos_Bloqueados_Writer.txt");
-		dormidos("procesos_Dormidos_Writer.txt");
-	}
-	else if (option ==3){
-		memoria("procesos_Memoria_Reader.txt");
-		bloqueados("procesos_Bloqueados_Reader.txt");
-		dormidos("procesos_Dormidos_Reader.txt");
-	}
-	else{
-		memoria("procesos_Memoria_Egoista.txt");
-		bloqueados("procesos_Bloqueados_Egoista.txt");
-		dormidos("procesos_Dormidos_Egoista.txt");
-	}
+	
 	return 0;
 }
